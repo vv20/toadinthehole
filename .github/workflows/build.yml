@@ -38,11 +38,15 @@ jobs:
       - name: Install dependencies
         run: |
           cd $GITHUB_WORKSPACE
+          # Python
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+          # NodeJS
           cd frontend
           npm ci
+          # CDK
+          npm install aws-cdk
 
       - name: Run tests
         run: |
