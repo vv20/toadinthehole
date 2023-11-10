@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install venv
+          pip install virtualenv
           cd $GITHUB_WORKSPACE
           python -m venv .venv
           . .venv/bin/activate
