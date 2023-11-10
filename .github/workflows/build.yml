@@ -25,12 +25,12 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Set up Python ${{ python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
 
-      - name: Set up NodeJS ${{ node-version }}
+      - name: Set up NodeJS
         uses: actions/setup-node@v3
         with:
           node-version: 18
