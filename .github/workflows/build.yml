@@ -38,8 +38,6 @@ jobs:
       - name: Install dependencies
         run: |
           cd $GITHUB_WORKSPACE
-          # CDK
-          npm install aws-cdk
           # Python
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -48,12 +46,16 @@ jobs:
           cd frontend
           npm ci
 
-      - name: Run tests
+      - name: Build
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'synth'
+
+      - name: Test
         run: |
           python -m pytest
 
-      - name: Build
+      - name: Package
         run: |
-          cdk synth
           DATETIME=$(date +%Y.%m.%d.%H.%M)
           tar -czf toad-in-the-hole-$DATETIME.tar.gz cdk.out/
