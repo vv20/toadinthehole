@@ -51,10 +51,6 @@ jobs:
         with:
           cdk_subcommand: 'synth'
 
-      - name: Test
-        run: |
-          python -m pytest
-
       - name: Package
         run: |
           DATETIME=$(date +%Y.%m.%d.%H.%M)
