@@ -27,13 +27,13 @@ jobs:
 
       - name: Debug
         run: |
-          echo ${{ env.AWS_REGION }}
+          echo $AWS_REGION
 
       - name: Set up AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_CICD_ROLE }}
-          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: $AWS_CICD_ROLE
+          aws-region: $AWS_REGION
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -69,4 +69,4 @@ jobs:
 
       - name: Upload
         run: |
-          aws s3 cp $ARTIFACT_NAME ${{ env.ARTIFACT_BUCKET }}
+          aws s3 cp $ARTIFACT_NAME $ARTIFACT_BUCKET
