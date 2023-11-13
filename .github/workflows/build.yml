@@ -25,6 +25,12 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
+      - name: Set up AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_CICD_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -54,4 +60,9 @@ jobs:
       - name: Package
         run: |
           DATETIME=$(date +%Y.%m.%d.%H.%M)
-          tar -czf toad-in-the-hole-$DATETIME.tar.gz cdk.out/
+          ARTIFACT_NAME=toad-in-the-hole-$DATETIME.tar.gz
+          tar -czf $ARTIFACT_NAME cdk.out/
+
+      - name: Upload
+        run: |
+          aws s3 cp $ARTIFACT_NAME ${{ env.ARTIFACT_BUCKET }}
