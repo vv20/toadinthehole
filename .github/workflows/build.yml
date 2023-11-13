@@ -25,10 +25,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Debug
-        run: |
-          echo ${{ vars.AWS_REGION }}
-
       - name: Set up AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
