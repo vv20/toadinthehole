@@ -61,12 +61,15 @@ jobs:
         with:
           cdk_subcommand: 'synth'
 
+      - name: Set Artifact Name
+        run: |
+          echo "DATETIME=$((date +%Y.%m.%d.%H.%M))" >> "$GITHUB_OUTPUT"
+          echo "ARTIFACT_NAME=toad-in-the-hole-$DATETIME.tar.gz" >> "$GITHUB_OUTPUT"
+
       - name: Package
         run: |
-          DATETIME=$(date +%Y.%m.%d.%H.%M)
-          ARTIFACT_NAME=toad-in-the-hole-$DATETIME.tar.gz
-          tar -czf $ARTIFACT_NAME cdk.out/
+          tar -czf ${{ steps.vars.output.ARTIFACT_NAME }} cdk.out/
 
       - name: Upload
         run: |
-          aws s3 cp $ARTIFACT_NAME ${{ vars.ARTIFACT_BUCKET }}
+          aws s3 cp ${{ steps.vars.output.ARTIFACT_NAME }} ${{ vars.ARTIFACT_BUCKET }}
