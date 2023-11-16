@@ -68,8 +68,12 @@ jobs:
 
       - name: Package
         run: |
-          tar -czf ${{ steps.vars.output.ARTIFACT_NAME }} cdk.out/
+          tar -czf $ARTIFACT_NAME cdk.out/
+        env:
+          ARTIFACT_NAME: ${{ steps.vars.output.artifact_name }}
 
       - name: Upload
         run: |
-          aws s3 cp ${{ steps.vars.output.ARTIFACT_NAME }} ${{ vars.ARTIFACT_BUCKET }}
+          aws s3 cp $ARTIFACT_NAME ${{ vars.ARTIFACT_BUCKET }}
+        env:
+          ARTIFACT_NAME: ${{ steps.vars.output.artifact_name }}
