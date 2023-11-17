@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Download
         run: |
-          aws s3 cp ${{ github.event.inputs.artifact-name }} .
+          aws s3 cp ${{ vars.ARTIFACT_BUCKET }}${{ github.event.inputs.artifact-name }} .
 
       - name: Unpack
         run: |
