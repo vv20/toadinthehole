@@ -13,9 +13,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-env:
-  ARTIFACT_NAME: 'toad-in-the-hole.tar.gz'
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -71,10 +68,13 @@ jobs:
 
       - name: Package
         run: |
-          tar -czf $ARTIFACT_NAME cdk.out/
+          tar -czf toad-in-the-hole.tar.gz cdk.out/
 
       - name: Upload
         run: |
+          DATETIME=$((date +%Y.%m.%d.%H.%M))
+          echo $DATETIME
+          ARTIFACT_NAME=toad-in-the-hole-$DATETIME.tar.gz
+          mv toad-in-the-hole.tar.gz $ARTIFACT_NAME
           aws s3 cp $ARTIFACT_NAME ${{ vars.ARTIFACT_BUCKET }}
         env:
-          ARTIFACT_NAME: ${{ steps.vars.output.artifact_name }}
