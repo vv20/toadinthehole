@@ -77,4 +77,3 @@ jobs:
           ARTIFACT_NAME=toad-in-the-hole-$DATETIME.tar.gz
           mv toad-in-the-hole.tar.gz $ARTIFACT_NAME
           aws s3 cp $ARTIFACT_NAME ${{ vars.ARTIFACT_BUCKET }}
-        env:
