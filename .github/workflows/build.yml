@@ -68,6 +68,8 @@ jobs:
 
       - name: Package
         run: |
+          echo $ARTIFACT_NAME
+          ls cdk.out/
           tar -czf $ARTIFACT_NAME cdk.out/
         env:
           ARTIFACT_NAME: ${{ steps.vars.output.artifact_name }}
