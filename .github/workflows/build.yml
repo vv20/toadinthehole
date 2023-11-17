@@ -64,12 +64,10 @@ jobs:
       - name: Set Artifact Name
         run: |
           DATETIME=$((date +%Y.%m.%d.%H.%M))
-          echo "artifact_name=toad-in-the-hole-$DATETIME.tar.gz" >> "$GITHUB_OUTPUT"
+          echo "artifact_name='toad-in-the-hole-$DATETIME.tar.gz'" >> "$GITHUB_OUTPUT"
 
       - name: Package
         run: |
-          echo $ARTIFACT_NAME
-          ls cdk.out/
           tar -czf $ARTIFACT_NAME cdk.out/
         env:
           ARTIFACT_NAME: ${{ steps.vars.output.artifact_name }}
