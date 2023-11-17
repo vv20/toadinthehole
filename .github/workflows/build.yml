@@ -72,7 +72,7 @@ jobs:
 
       - name: Upload
         run: |
-          DATETIME=$((date +%Y.%m.%d.%H.%M))
+          DATETIME=$((date "+%Y.%m.%d.%H.%M"))
           echo $DATETIME
           ARTIFACT_NAME=toad-in-the-hole-$DATETIME.tar.gz
           mv toad-in-the-hole.tar.gz $ARTIFACT_NAME
