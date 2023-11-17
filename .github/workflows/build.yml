@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           cd $GITHUB_WORKSPACE
           # Python
