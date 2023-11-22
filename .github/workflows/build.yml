@@ -59,20 +59,5 @@ jobs:
       - name: Build
         uses: youyo/aws-cdk-github-actions@v2
         with:
-          cdk_subcommand: 'synth'
-
-      - name: Set Artifact Name
-        run: |
-          DATETIME=$((date +%Y.%m.%d.%H.%M))
-          echo "artifact_name='toad-in-the-hole-$DATETIME.tar.gz'" >> "$GITHUB_OUTPUT"
-
-      - name: Package
-        run: |
-          tar -czf toad-in-the-hole.tar.gz cdk.out/
-
-      - name: Upload
-        run: |
-          DATETIME=`date +%Y.%m.%d.%H.%M`
-          ARTIFACT_NAME=toad-in-the-hole-$DATETIME.tar.gz
-          mv toad-in-the-hole.tar.gz $ARTIFACT_NAME
-          aws s3 cp $ARTIFACT_NAME ${{ vars.ARTIFACT_BUCKET }}
+          cdk_subcommand: 'deploy'
+          cdk_stack: 'dev'
