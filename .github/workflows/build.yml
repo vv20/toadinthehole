@@ -61,4 +61,4 @@ jobs:
         with:
           cdk_subcommand: 'deploy'
           cdk_stack: 'dev'
-          cdk_args: '--context domain_name=$DEPLOYMENT_DOMAIN_NAME'
+          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }}'
