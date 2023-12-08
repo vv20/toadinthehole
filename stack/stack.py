@@ -1,11 +1,14 @@
 import subprocess
 
 from aws_cdk import (
+    aws_certificatemanager as acm,
     aws_apigateway as apigateway,
     aws_cognito as cognito,
     aws_dynamodb as dynamodb,
     aws_iam as iam,
     aws_lambda as lambda_,
+    aws_route53 as route53,
+    aws_route53_targets as route53_targets,
     aws_s3 as s3,
     aws_s3_deployment as s3_deployment,
     Duration,
@@ -17,6 +20,7 @@ class ToadInTheHoleStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+        domain_name = self.node.try_get_context('domain_name')
         frontend_bucket, image_bucket = self.create_s3_buckets(construct_id)
         recipe_table = self.create_dynamodb_table(construct_id)
         api_role, lambda_role = self.setup_iam(
@@ -29,16 +33,22 @@ class ToadInTheHoleStack(Stack):
                 construct_id,
                 lambda_role,
                 recipe_table)
+        zone = self.configure_dns(
+                construct_id,
+                domain_name,
+                frontend_bucket)
+        certificate = self.create_certificate(construct_id, domain_name, zone)
         api = self.create_api_gateway(
                 construct_id,
+                domain_name,
                 api_role,
                 user_pool,
                 recipe_handler,
                 collection_handler,
                 image_handler,
-                frontend_bucket,
-                image_bucket)
-        self.create_frontend_deployment(construct_id, frontend_bucket, api)
+                image_bucket,
+                certificate)
+        self.create_frontend_deployment(construct_id, frontend_bucket)
 
     def create_s3_buckets(self, environment):
         frontend_bucket = s3.Bucket(
@@ -197,13 +207,14 @@ class ToadInTheHoleStack(Stack):
     def create_api_gateway(
             self,
             environment,
+            domain_name,
             api_role,
             user_pool,
             recipe_handler,
             collection_handler,
             image_handler,
-            frontend_bucket,
-            image_bucket):
+            image_bucket,
+            certificate):
         authorizer = apigateway.CognitoUserPoolsAuthorizer(
                 self,
                 'cognito-user-pool-authorizer-' + environment,
@@ -215,9 +226,15 @@ class ToadInTheHoleStack(Stack):
                 rest_api_name='Toad in the Hole API',
                 deploy=True)
 
+        domain_name = apigateway.DomainName(
+                self,
+                'toad-in-the-hole-api-domain-name-' + environment,
+                mapping=api,
+                certificate=certificate,
+                domain_name='api.' + environment + '.' + domain_name)
+
         recipe_resource     = api.root.add_resource('recipe')
         collection_resource = api.root.add_resource('collection')
-        ui_resource         = api.root.add_resource('{resource}')
         image_resource      = api.root.add_resource('image')
 
         recipe_resource.add_method(
@@ -248,16 +265,6 @@ class ToadInTheHoleStack(Stack):
                     collection_handler,
                     credentials_role=api_role))
 
-        ui_resource.add_method(
-                'GET',
-                authorizer=authorizer,
-                integration=apigateway.AwsIntegration(
-                    service='s3',
-                    path=frontend_bucket.bucket_website_url + '/{resource}',
-                    integration_http_method='GET',
-                    options=apigateway.IntegrationOptions(
-                        credentials_role=api_role)))
-
         image_resource.add_method(
                 'GET',
                 authorizer=authorizer,
@@ -277,7 +284,33 @@ class ToadInTheHoleStack(Stack):
 
         return api
 
-    def create_frontend_deployment(self, environment, frontend_bucket, api):
+    def create_certificate(self, environment, domain_name, zone):
+        certificate = acm.Certificate(
+                self,
+                environment + '-certificate',
+                domain_name='*.' + domain_name,
+                validation=acm.CertificateValidation.from_dns(zone))
+        return certificate
+
+    def configure_dns(
+            self,
+            environment,
+            domain_name,
+            frontend_bucket):
+        zone = route53.HostedZone.from_lookup(
+                self,
+                'zone',
+                domain_name=domain_name)
+        record = route53.ARecord(
+                self,
+                environment + '-frontend-record',
+                zone=zone,
+                target=route53.RecordTarget.from_alias(
+                    route53_targets.BucketWebsiteTarget(frontend_bucket)),
+                record_name='www.' + environment)
+        return zone
+
+    def create_frontend_deployment(self, environment, frontend_bucket):
         build_process = subprocess.run(
                 'npm run build:' + environment,
                 cwd='frontend',
