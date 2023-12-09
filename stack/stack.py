@@ -12,6 +12,7 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_s3_deployment as s3_deployment,
     Duration,
+    RemovalPolicy,
     Stack
 )
 from constructs import Construct
@@ -54,6 +55,8 @@ class ToadInTheHoleStack(Stack):
         frontend_bucket = s3.Bucket(
                 self,
                 'toad-in-the-hole-frontend-' + environment,
+                public_read_access=True,
+                removal_policy=RemovalPolicy.DESTROY,
                 website_index_document='index.html')
 
         image_bucket = s3.Bucket(self, 'toad-in-the-hole-images-' + environment)
@@ -311,12 +314,11 @@ class ToadInTheHoleStack(Stack):
                 self,
                 'zone',
                 domain_name=domain_name)
-        record = route53.ARecord(
+        record = route53.CnameRecord(
                 self,
                 environment + '-frontend-record',
                 zone=zone,
-                target=route53.RecordTarget.from_alias(
-                    route53_targets.BucketWebsiteTarget(frontend_bucket)),
+                domain_name=frontend_bucket.bucket_website_domain_name,
                 record_name='www.' + environment)
         return zone
 
