@@ -37,7 +37,7 @@ class ToadInTheHoleStack(Stack):
                 construct_id,
                 domain_name,
                 frontend_bucket)
-        certificate = self.create_certificate(construct_id, domain_name, zone)
+        api_certificate = self.create_certificates(construct_id, domain_name, zone)
         api = self.create_api_gateway(
                 construct_id,
                 domain_name,
@@ -47,7 +47,7 @@ class ToadInTheHoleStack(Stack):
                 collection_handler,
                 image_handler,
                 image_bucket,
-                certificate)
+                api_certificate)
         self.create_frontend_deployment(construct_id, frontend_bucket)
 
     def create_s3_buckets(self, environment):
@@ -284,13 +284,23 @@ class ToadInTheHoleStack(Stack):
 
         return api
 
-    def create_certificate(self, environment, domain_name, zone):
-        certificate = acm.Certificate(
+    def create_certificates(self, environment, domain_name, zone):
+        env_certificate = acm.Certificate(
                 self,
                 environment + '-certificate',
-                domain_name='*.' + domain_name,
+                domain_name=environment + '.' + domain_name,
                 validation=acm.CertificateValidation.from_dns(zone))
-        return certificate
+        frontend_certificate = acm.Certificate(
+                self,
+                environment + '-frontend-certificate',
+                domain_name='www.' + environment + '.' + domain_name,
+                validation=acm.CertificateValidation.from_dns(zone))
+        api_certificate = acm.Certificate(
+                self,
+                environment + '-api-certificate',
+                domain_name='api.' + environment + '.' + domain_name,
+                validation=acm.CertificateValidation.from_dns(zone))
+        return api_certificate
 
     def configure_dns(
             self,
