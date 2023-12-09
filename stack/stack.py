@@ -2,6 +2,8 @@ import subprocess
 
 from aws_cdk import (
     aws_certificatemanager as acm,
+    aws_cloudfront as cloudfront,
+    aws_cloudfront_origins as cloudfront_origins,
     aws_apigateway as apigateway,
     aws_cognito as cognito,
     aws_dynamodb as dynamodb,
@@ -34,11 +36,7 @@ class ToadInTheHoleStack(Stack):
                 construct_id,
                 lambda_role,
                 recipe_table)
-        zone = self.configure_dns(
-                construct_id,
-                domain_name,
-                frontend_bucket)
-        api_certificate = self.create_certificates(construct_id, domain_name, zone)
+        api_certificate, frontend_certificate = self.create_certificates(construct_id, domain_name)
         api = self.create_api_gateway(
                 construct_id,
                 domain_name,
@@ -49,14 +47,17 @@ class ToadInTheHoleStack(Stack):
                 image_handler,
                 image_bucket,
                 api_certificate)
+        self.create_cdn_distribution(
+                construct_id,
+                domain_name,
+                frontend_bucket,
+                frontend_certificate)
         self.create_frontend_deployment(construct_id, frontend_bucket)
 
     def create_s3_buckets(self, environment):
         frontend_bucket = s3.Bucket(
                 self,
                 'toad-in-the-hole-frontend-' + environment,
-                public_read_access=True,
-                removal_policy=RemovalPolicy.DESTROY,
                 website_index_document='index.html')
 
         image_bucket = s3.Bucket(self, 'toad-in-the-hole-images-' + environment)
@@ -287,7 +288,11 @@ class ToadInTheHoleStack(Stack):
 
         return api
 
-    def create_certificates(self, environment, domain_name, zone):
+    def create_certificates(self, environment, domain_name):
+        zone = route53.HostedZone.from_lookup(
+                self,
+                'zone',
+                domain_name=domain_name)
         env_certificate = acm.Certificate(
                 self,
                 environment + '-certificate',
@@ -303,24 +308,29 @@ class ToadInTheHoleStack(Stack):
                 environment + '-api-certificate',
                 domain_name='api.' + environment + '.' + domain_name,
                 validation=acm.CertificateValidation.from_dns(zone))
-        return api_certificate
+        return api_certificate, frontend_certificate
 
-    def configure_dns(
+    def create_cdn_distribution(
             self,
             environment,
             domain_name,
-            frontend_bucket):
-        zone = route53.HostedZone.from_lookup(
+            frontend_bucket,
+            frontend_certificate):
+        oai = cloudfront.OriginAccessIdentity(
                 self,
-                'zone',
-                domain_name=domain_name)
-        record = route53.CnameRecord(
+                environment + '-origin-access-identity')
+        frontend_bucket.grant_read(oai)
+
+        distribution = cloudfront.Distribution(
                 self,
-                environment + '-frontend-record',
-                zone=zone,
-                domain_name=frontend_bucket.bucket_website_domain_name,
-                record_name='www.' + environment)
-        return zone
+                environment + '-distribution',
+                default_root_object='index.html',
+                default_behavior=cloudfront.BehaviorOptions(
+                    origin=cloudfront_origins.S3Origin(
+                        frontend_bucket,
+                        origin_access_identity=oai)),
+                certificate=frontend_certificate,
+                domain_names=['www.' + environment + '.' + domain_name])
 
     def create_frontend_deployment(self, environment, frontend_bucket):
         build_process = subprocess.run(
