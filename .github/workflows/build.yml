@@ -41,7 +41,7 @@ jobs:
         with:
           cdk_subcommand: 'deploy'
           cdk_stack: 'backend-dev'
-          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }}'
+          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --exclusively'
 
   build-frontend:
     runs-on: ubuntu-latest
@@ -89,5 +89,5 @@ jobs:
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'deploy'
-          cdk_stack: 'dev'
-          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }}'
+          cdk_stack: 'frontend-dev'
+          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --exclusively'
