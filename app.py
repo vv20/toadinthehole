@@ -3,16 +3,25 @@ import os
 
 import aws_cdk as cdk
 
-from stack.stack import ToadInTheHoleStack
+from stack.frontend_stack import ToadInTheHoleFrontendStack
+from stack.backend_stack import ToadInTheHoleBackendStack
 
 app = cdk.App()
-ToadInTheHoleStack(
+ToadInTheHoleFrontendStack(
         app,
-        'dev',
+        'frontend-dev',
         env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')))
-ToadInTheHoleStack(
+ToadInTheHoleBackendStack(
         app,
-        'prod',
+        'backend-dev',
+        env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')))
+ToadInTheHoleFrontendStack(
+        app,
+        'frontend-prod',
+        env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')))
+ToadInTheHoleBackendStack(
+        app,
+        'backend-prod',
         env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')))
 
 app.synth()

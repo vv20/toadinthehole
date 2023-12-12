@@ -1,34 +1,26 @@
-import subprocess
-
 from aws_cdk import (
     aws_certificatemanager as acm,
-    aws_cloudfront as cloudfront,
-    aws_cloudfront_origins as cloudfront_origins,
     aws_apigateway as apigateway,
     aws_cognito as cognito,
     aws_dynamodb as dynamodb,
     aws_iam as iam,
     aws_lambda as lambda_,
     aws_route53 as route53,
-    aws_route53_targets as route53_targets,
     aws_s3 as s3,
-    aws_s3_deployment as s3_deployment,
     Duration,
-    RemovalPolicy,
     Stack
 )
 from constructs import Construct
 
-class ToadInTheHoleStack(Stack):
+class ToadInTheHoleBackendStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         domain_name = self.node.try_get_context('domain_name')
-        frontend_bucket, image_bucket = self.create_s3_buckets(construct_id)
+        image_bucket = self.create_s3_bucket(construct_id)
         recipe_table = self.create_dynamodb_table(construct_id)
         api_role, lambda_role = self.setup_iam(
                 construct_id,
-                frontend_bucket,
                 image_bucket,
                 recipe_table)
         user_pool = self.setup_cognito(construct_id)
@@ -36,7 +28,7 @@ class ToadInTheHoleStack(Stack):
                 construct_id,
                 lambda_role,
                 recipe_table)
-        api_certificate, frontend_certificate = self.create_certificates(construct_id, domain_name)
+        api_certificate = self.create_certificate(construct_id, domain_name)
         api = self.create_api_gateway(
                 construct_id,
                 domain_name,
@@ -47,22 +39,10 @@ class ToadInTheHoleStack(Stack):
                 image_handler,
                 image_bucket,
                 api_certificate)
-        self.create_cdn_distribution(
-                construct_id,
-                domain_name,
-                frontend_bucket,
-                frontend_certificate)
-        self.create_frontend_deployment(construct_id, frontend_bucket)
 
-    def create_s3_buckets(self, environment):
-        frontend_bucket = s3.Bucket(
-                self,
-                'toad-in-the-hole-frontend-' + environment,
-                website_index_document='index.html')
-
+    def create_s3_bucket(self, environment):
         image_bucket = s3.Bucket(self, 'toad-in-the-hole-images-' + environment)
-
-        return frontend_bucket, image_bucket
+        return image_bucket
 
     def create_dynamodb_table(self, environment):
         recipe_table = dynamodb.TableV2(
@@ -76,7 +56,6 @@ class ToadInTheHoleStack(Stack):
     def setup_iam(
             self,
             environment,
-            frontend_bucket,
             image_bucket,
             recipe_table):
         lambda_role = iam.Role(
@@ -88,16 +67,6 @@ class ToadInTheHoleStack(Stack):
                 self,
                 'api-role-' + environment,
                 assumed_by=iam.ServicePrincipal('apigateway.amazonaws.com'))
-
-        frontend_bucket_read_only_policy = iam.Policy(
-                self,
-                'frontend-bucket-read-only-policy-' + environment,
-                statements=[
-                    iam.PolicyStatement(
-                        actions=['s3-bucket:GetObject'],
-                        resources=[frontend_bucket.bucket_arn]
-                    )])
-        frontend_bucket_read_only_policy.attach_to_role(api_role)
 
         image_bucket_read_only_policy = iam.Policy(
                 self,
@@ -288,7 +257,7 @@ class ToadInTheHoleStack(Stack):
 
         return api
 
-    def create_certificates(self, environment, domain_name):
+    def create_certificate(self, environment, domain_name):
         zone = route53.HostedZone.from_lookup(
                 self,
                 'zone',
@@ -298,50 +267,9 @@ class ToadInTheHoleStack(Stack):
                 environment + '-certificate',
                 domain_name=environment + '.' + domain_name,
                 validation=acm.CertificateValidation.from_dns(zone))
-        frontend_certificate = acm.Certificate(
-                self,
-                environment + '-frontend-certificate',
-                domain_name='www.' + environment + '.' + domain_name,
-                validation=acm.CertificateValidation.from_dns(zone))
         api_certificate = acm.Certificate(
                 self,
                 environment + '-api-certificate',
                 domain_name='api.' + environment + '.' + domain_name,
                 validation=acm.CertificateValidation.from_dns(zone))
-        return api_certificate, frontend_certificate
-
-    def create_cdn_distribution(
-            self,
-            environment,
-            domain_name,
-            frontend_bucket,
-            frontend_certificate):
-        oai = cloudfront.OriginAccessIdentity(
-                self,
-                environment + '-origin-access-identity')
-        frontend_bucket.grant_read(oai)
-
-        distribution = cloudfront.Distribution(
-                self,
-                environment + '-distribution',
-                default_root_object='index.html',
-                default_behavior=cloudfront.BehaviorOptions(
-                    origin=cloudfront_origins.S3Origin(
-                        frontend_bucket,
-                        origin_access_identity=oai)),
-                certificate=frontend_certificate,
-                domain_names=['www.' + environment + '.' + domain_name])
-
-    def create_frontend_deployment(self, environment, frontend_bucket):
-        build_process = subprocess.run(
-                'npm run build:' + environment,
-                cwd='frontend',
-                shell=True)
-        build_process.check_returncode()
-
-        frontend_deployment = s3_deployment.BucketDeployment(
-                self,
-                'frontend-deployment-' + environment,
-                sources=[s3_deployment.Source.asset('frontend/build')],
-                destination_bucket=frontend_bucket,
-                retain_on_delete=False)
+        return api_certificate
