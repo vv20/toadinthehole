@@ -8,6 +8,7 @@ from aws_cdk import (
     Stack
 )
 from constructs import Construct
+from os.path import exists
 
 class ToadInTheHoleFrontendStack(Stack):
 
@@ -65,6 +66,8 @@ class ToadInTheHoleFrontendStack(Stack):
                 domain_names=['www.' + environment + '.' + domain_name])
 
     def create_frontend_deployment(self, environment, frontend_bucket):
+        if not exists('frontend/build'):
+            return
         frontend_deployment = s3_deployment.BucketDeployment(
                 self,
                 'frontend-deployment-' + environment,
