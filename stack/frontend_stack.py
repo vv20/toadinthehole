@@ -3,6 +3,7 @@ from aws_cdk import (
     aws_cloudfront as cloudfront,
     aws_cloudfront_origins as cloudfront_origins,
     aws_route53 as route53,
+    aws_route53_targets as route53_targets,
     aws_s3 as s3,
     aws_s3_deployment as s3_deployment,
     Stack
@@ -17,11 +18,12 @@ class ToadInTheHoleFrontendStack(Stack):
         domain_name = self.node.try_get_context('domain_name')
         frontend_bucket = self.create_s3_bucket(construct_id)
         frontend_certificate = self.create_certificate(construct_id, domain_name)
-        self.create_cdn_distribution(
+        distribution = self.create_cdn_distribution(
                 construct_id,
                 domain_name,
                 frontend_bucket,
                 frontend_certificate)
+        self.configure_dns(construct_id, domain_name, distribution)
         self.create_frontend_deployment(construct_id, frontend_bucket)
 
     def create_s3_bucket(self, environment):
@@ -64,6 +66,16 @@ class ToadInTheHoleFrontendStack(Stack):
                         origin_access_identity=oai)),
                 certificate=frontend_certificate,
                 domain_names=['www.' + environment + '.' + domain_name])
+
+        return distribution
+
+    def configure_dns(self, environment, domain_name, distribution):
+        record = route53.ARecord(
+                self,
+                environment + '-frontend-alias-record',
+                record_name='www.' + environment + '.' + domain_name,
+                target=route53.RecordTarget.from_alias(
+                    route53_targets.CloudFrontTarget(distribution)))
 
     def create_frontend_deployment(self, environment, frontend_bucket):
         if not exists('frontend/build'):
