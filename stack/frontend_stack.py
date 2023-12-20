@@ -17,13 +17,14 @@ class ToadInTheHoleFrontendStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
         domain_name = self.node.try_get_context('domain_name')
         frontend_bucket = self.create_s3_bucket(construct_id)
-        frontend_certificate = self.create_certificate(construct_id, domain_name)
+        zone = self.lookup_zone(domain_name)
+        frontend_certificate = self.create_certificate(construct_id, domain_name, zone)
         distribution = self.create_cdn_distribution(
                 construct_id,
                 domain_name,
                 frontend_bucket,
                 frontend_certificate)
-        self.configure_dns(construct_id, domain_name, distribution)
+        self.configure_dns(construct_id, domain_name, zone, distribution)
         self.create_frontend_deployment(construct_id, frontend_bucket)
 
     def create_s3_bucket(self, environment):
@@ -33,11 +34,13 @@ class ToadInTheHoleFrontendStack(Stack):
                 website_index_document='index.html')
         return frontend_bucket
 
-    def create_certificate(self, environment, domain_name):
-        zone = route53.HostedZone.from_lookup(
+    def lookup_zone(self, domain_name):
+        return route53.HostedZone.from_lookup(
                 self,
                 'zone',
                 domain_name=domain_name)
+
+    def create_certificate(self, environment, domain_name, zone):
         frontend_certificate = acm.Certificate(
                 self,
                 environment + '-frontend-certificate',
@@ -69,10 +72,11 @@ class ToadInTheHoleFrontendStack(Stack):
 
         return distribution
 
-    def configure_dns(self, environment, domain_name, distribution):
+    def configure_dns(self, environment, domain_name, zone, distribution):
         record = route53.ARecord(
                 self,
                 environment + '-frontend-alias-record',
+                zone=zone,
                 record_name='www.' + environment + '.' + domain_name,
                 target=route53.RecordTarget.from_alias(
                     route53_targets.CloudFrontTarget(distribution)))
