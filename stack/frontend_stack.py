@@ -31,7 +31,8 @@ class ToadInTheHoleFrontendStack(Stack):
         frontend_bucket = s3.Bucket(
                 self,
                 'toad-in-the-hole-frontend-' + environment,
-                website_index_document='index.html')
+                website_index_document='index.html',
+                public_read_access=True)
         return frontend_bucket
 
     def lookup_zone(self, domain_name):
