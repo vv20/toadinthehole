@@ -1,26 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { getCurrentUser } from "aws-amplify/auth";
+import { useEffect, useState } from "react";
+
+import "./App.css";
+import logo from "./logo.svg";
+
+import LoginForm from "./LoginForm";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkLogIn = async () => {
+      try {
+        const { username, userId, signInDetails } = await getCurrentUser();
+        console.log(username);
+        setIsLoggedIn(true);
+      } catch (e) {
+        console.log(e);
+        setIsLoggedIn(false);
+      }
+    };
+    checkLogIn();
+  }, []);
+
+  if (!isLoggedIn) {
+    return (
+      <div className="App">
+        <LoginForm />
+      </div>
+    );
+  } else {
+    return (
+      <div className="App">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+      </div>
+    );
+  }
 }
 
 export default App;
