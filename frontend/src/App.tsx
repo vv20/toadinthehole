@@ -23,7 +23,7 @@ function App() {
   useEffect(() => {
     const checkLogIn = async () => {
       try {
-        const { username, userId, signInDetails } = await getCurrentUser();
+        const { username } = await getCurrentUser();
         console.log(username);
         setIsLoggedIn(true);
       } catch (e) {
