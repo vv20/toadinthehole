@@ -32,7 +32,12 @@ class ToadInTheHoleFrontendStack(Stack):
                 self,
                 'ToadInTheHoleFrontendBucket' + environment,
                 website_index_document='index.html',
-                public_read_access=True)
+                public_read_access=True,
+                block_public_access=s3.BlockPublicAccess(
+                    block_public_acls=False,
+                    block_public_policy=False,
+                    ignore_public_acls=False,
+                    restrict_public_buckets=False))
         return frontend_bucket
 
     def lookup_zone(self, domain_name):
