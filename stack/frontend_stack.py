@@ -30,7 +30,7 @@ class ToadInTheHoleFrontendStack(Stack):
     def create_s3_bucket(self, environment):
         frontend_bucket = s3.Bucket(
                 self,
-                'toad-in-the-hole-frontend-' + environment,
+                'ToadInTheHoleFrontendBucket' + environment,
                 website_index_document='index.html',
                 public_read_access=True)
         return frontend_bucket
@@ -44,7 +44,7 @@ class ToadInTheHoleFrontendStack(Stack):
     def create_certificate(self, environment, domain_name, zone):
         frontend_certificate = acm.Certificate(
                 self,
-                environment + '-frontend-certificate',
+                'ToadInTheHoleFrontendCertificate' + environment,
                 domain_name='www.' + environment + '.' + domain_name,
                 validation=acm.CertificateValidation.from_dns(zone))
         return frontend_certificate
@@ -57,12 +57,12 @@ class ToadInTheHoleFrontendStack(Stack):
             frontend_certificate):
         oai = cloudfront.OriginAccessIdentity(
                 self,
-                environment + '-origin-access-identity')
+                'ToadInTheHoleOriginAccessIdentity' + environment)
         frontend_bucket.grant_read(oai)
 
         distribution = cloudfront.Distribution(
                 self,
-                environment + '-distribution',
+                'ToadInTheHoleCloudFrontDistribution' + environment,
                 default_root_object='index.html',
                 default_behavior=cloudfront.BehaviorOptions(
                     origin=cloudfront_origins.S3Origin(
@@ -74,9 +74,9 @@ class ToadInTheHoleFrontendStack(Stack):
         return distribution
 
     def configure_dns(self, environment, domain_name, zone, distribution):
-        record = route53.ARecord(
+        route53.ARecord(
                 self,
-                environment + '-frontend-alias-record',
+                'ToadInTheHoleFrontendAliasRecord' + environment,
                 zone=zone,
                 record_name='www.' + environment + '.' + domain_name,
                 target=route53.RecordTarget.from_alias(
@@ -85,9 +85,9 @@ class ToadInTheHoleFrontendStack(Stack):
     def create_frontend_deployment(self, environment, frontend_bucket):
         if not exists('frontend/build'):
             return
-        frontend_deployment = s3_deployment.BucketDeployment(
+        s3_deployment.BucketDeployment(
                 self,
-                'frontend-deployment-' + environment,
+                'ToadInTheHoleFrontendDeployment' + environment,
                 sources=[s3_deployment.Source.asset('frontend/build')],
                 destination_bucket=frontend_bucket,
                 retain_on_delete=False)

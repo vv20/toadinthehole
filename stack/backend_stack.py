@@ -41,14 +41,14 @@ class ToadInTheHoleBackendStack(Stack):
                 api_certificate)
 
     def create_s3_bucket(self, environment):
-        image_bucket = s3.Bucket(self, 'toad-in-the-hole-images-' + environment)
+        image_bucket = s3.Bucket(self, 'ToadInTheHoleImageBucket' + environment)
         return image_bucket
 
     def create_dynamodb_table(self, environment):
         recipe_table = dynamodb.TableV2(
                 self,
-                'toad-in-the-hole-recipes-' + environment,
-                table_name='toad-in-the-hole-recipes-' + environment,
+                'ToadInTheHoleRecipeTable' + environment,
+                table_name='ToadInTheHoleRecipeTable' + environment,
                 partition_key=dynamodb.Attribute(name='slug', type=dynamodb.AttributeType.STRING),
                 billing=dynamodb.Billing.on_demand())
         return recipe_table
@@ -60,17 +60,17 @@ class ToadInTheHoleBackendStack(Stack):
             recipe_table):
         lambda_role = iam.Role(
                 self,
-                'lambda-role-' + environment,
+                'ToadInTheHoleLambdaRole' + environment,
                 assumed_by=iam.ServicePrincipal('lambda.amazonaws.com'))
 
         api_role = iam.Role(
                 self,
-                'api-role-' + environment,
+                'ToadInTheHoleApiRole' + environment,
                 assumed_by=iam.ServicePrincipal('apigateway.amazonaws.com'))
 
         image_bucket_read_only_policy = iam.Policy(
                 self,
-                'image-bucket-read-only-policy-' + environment,
+                'ToadInTheHoleImageBucketReadOnlyPolicy' + environment,
                 statements=[
                     iam.PolicyStatement(
                         actions=['s3-bucket:GetObject'],
@@ -80,7 +80,7 @@ class ToadInTheHoleBackendStack(Stack):
 
         image_bucket_write_only_policy = iam.Policy(
                 self,
-                'image-bucket-write-only-policy-' + environment,
+                'ToadInTheHoleImageBucketWriteOnlyPolicy' + environment,
                 statements=[
                     iam.PolicyStatement(
                         actions=['s3-bucket:PutObject'],
@@ -90,7 +90,7 @@ class ToadInTheHoleBackendStack(Stack):
 
         recipe_table_read_write_policy = iam.Policy(
                 self,
-                'recipe-table-read-write-policy-' + environment,
+                'ToadInTheHoleRecipeTableReadWritePolicy' + environment,
                 statements=[
                     iam.PolicyStatement(
                         actions=[
@@ -109,8 +109,8 @@ class ToadInTheHoleBackendStack(Stack):
     def setup_cognito(self, environment):
         user_pool = cognito.UserPool(
                 self,
-                'toad-in-the-hole-user-pool-' + environment,
-                user_pool_name='UserPool',
+                'ToadInTheHoleUserPool' + environment,
+                user_pool_name='ToadInTheHoleUserPool' + environment,
                 self_sign_up_enabled=False,
                 sign_in_case_sensitive=True,
                 sign_in_aliases=cognito.SignInAliases(email=True),
@@ -134,8 +134,8 @@ class ToadInTheHoleBackendStack(Stack):
                 account_recovery=cognito.AccountRecovery.EMAIL_ONLY)
 
         cognito_client = user_pool.add_client(
-                'toad-in-the-hole-user-pool-client-' + environment,
-                user_pool_client_name='toad-in-the-hole-user-pool-client-' + environment,
+                'ToadInTheHoleUserPoolClient' + environment,
+                user_pool_client_name='ToadInTheHoleUserPoolClient' + environment,
                 o_auth=cognito.OAuthSettings(
                     flows=cognito.OAuthFlows(authorization_code_grant=True),
                     scopes=[cognito.OAuthScope.OPENID]),
@@ -159,19 +159,19 @@ class ToadInTheHoleBackendStack(Stack):
 
         recipe_handler = lambda_.Function(
                 self,
-                'recipe-handler-' + environment,
+                'ToadInTheHoleRecipeHandler' + environment,
                 handler='recipe.handler',
                 **lambda_kwargs)
 
         collection_handler = lambda_.Function(
                 self,
-                'recipe-collection-handler-' + environment,
+                'ToadInTheHoleRecipeCollectionHandler' + environment,
                 handler='recipe_collection.handler',
                 **lambda_kwargs)
 
         image_handler = lambda_.Function(
                 self,
-                'image-handler-' + environment,
+                'ToadInTheHoleImageHandler' + environment,
                 handler='image.handler',
                 **lambda_kwargs)
 
@@ -190,18 +190,18 @@ class ToadInTheHoleBackendStack(Stack):
             certificate):
         authorizer = apigateway.CognitoUserPoolsAuthorizer(
                 self,
-                'cognito-user-pool-authorizer-' + environment,
+                'ToadInTheHoleCognitoUserPoolAuthorizer' + environment,
                 cognito_user_pools=[user_pool])
 
         api = apigateway.RestApi(
                 self,
-                'toad-in-the-hole-api-' + environment,
-                rest_api_name='Toad in the Hole API',
+                'ToadInTheHoleApi' + environment,
+                rest_api_name='ToadInTheHoleApi' + environment,
                 deploy=True)
 
         domain_name = apigateway.DomainName(
                 self,
-                'toad-in-the-hole-api-domain-name-' + environment,
+                'ToadInTheHoleApiDomainName' + environment,
                 mapping=api,
                 certificate=certificate,
                 domain_name='api.' + environment + '.' + domain_name)
@@ -264,12 +264,12 @@ class ToadInTheHoleBackendStack(Stack):
                 domain_name=domain_name)
         env_certificate = acm.Certificate(
                 self,
-                environment + '-certificate',
+                'ToadInTheHoleEnvironmentCertificate' + environment,
                 domain_name=environment + '.' + domain_name,
                 validation=acm.CertificateValidation.from_dns(zone))
         api_certificate = acm.Certificate(
                 self,
-                environment + '-api-certificate',
+                'ToadInTheHoleApiCertificate' + environment,
                 domain_name='api.' + environment + '.' + domain_name,
                 validation=acm.CertificateValidation.from_dns(zone))
         return api_certificate
