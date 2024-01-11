@@ -1,4 +1,5 @@
 from aws_cdk import (
+    aws_certificatemanager as acm,
     aws_cloudfront as cloudfront,
     aws_cloudfront_origins as cloudfront_origins,
     aws_route53 as route53,
@@ -17,10 +18,12 @@ class ToadInTheHoleFrontendStack(Stack):
         domain_name = self.node.try_get_context('domain_name')
         frontend_bucket = self.create_s3_bucket(construct_id)
         zone = self.lookup_zone(domain_name)
+        frontend_certificate = self.create_certificate(construct_id, domain_name, zone)
         distribution = self.create_cdn_distribution(
                 construct_id,
                 domain_name,
-                frontend_bucket)
+                frontend_bucket,
+                frontend_certificate)
         self.configure_dns(construct_id, domain_name, zone, distribution)
         self.create_frontend_deployment(construct_id, frontend_bucket)
 
@@ -43,11 +46,20 @@ class ToadInTheHoleFrontendStack(Stack):
                 'zone',
                 domain_name=domain_name)
 
+    def create_certificate(self, environment, domain_name, zone):
+        frontend_certificate = acm.Certificate(
+                self,
+                'ToadInTheHoleFrontendCertificate' + environment,
+                domain_name='www.' + environment + '.' + domain_name,
+                validation=acm.CertificateValidation.from_dns(zone))
+        return frontend_certificate
+
     def create_cdn_distribution(
             self,
             environment,
             domain_name,
-            frontend_bucket):
+            frontend_bucket,
+            frontend_certificate):
         oai = cloudfront.OriginAccessIdentity(
                 self,
                 'ToadInTheHoleOriginAccessIdentity' + environment)
@@ -61,6 +73,7 @@ class ToadInTheHoleFrontendStack(Stack):
                     origin=cloudfront_origins.S3Origin(
                         frontend_bucket,
                         origin_access_identity=oai)),
+                certificate=frontend_certificate,
                 domain_names=['www.' + environment + '.' + domain_name])
 
         return distribution
