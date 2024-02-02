@@ -57,6 +57,13 @@ jobs:
           cdk_stack: 'main-dev'
           cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=dev --exclusively'
 
+      - name: Set up AWS Credentials for CDN
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_CICD_ROLE }}
+          # have to change the region to us-east-1 for the CDN to work
+          aws-region: 'us-east-1'
+
       - name: Build CDN Stack
         uses: youyo/aws-cdk-github-actions@v2
         with:
