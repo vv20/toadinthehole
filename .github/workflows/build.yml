@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-main:
+  build:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -23,41 +23,6 @@ jobs:
         with:
           role-to-assume: ${{ vars.AWS_CICD_ROLE }}
           aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.12
-
-      - name: Install Dependencies
-        run: |
-          cd $GITHUB_WORKSPACE
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
-
-      - name: Build
-        uses: youyo/aws-cdk-github-actions@v2
-        with:
-          cdk_subcommand: 'deploy'
-          cdk_stack: 'main-dev'
-          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=dev --exclusively'
-
-  build-cdn:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.AWS_CICD_ROLE }}
-          # have to deploy the frontend to the us-east-1 region for the CDN to work
-          aws-region: 'us-east-1'
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -85,7 +50,14 @@ jobs:
           cd frontend
           npm run build:dev
 
-      - name: Build Stack
+      - name: Build Main Stack
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'deploy'
+          cdk_stack: 'main-dev'
+          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=dev --exclusively'
+
+      - name: Build CDN Stack
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'deploy'
