@@ -1,36 +1,37 @@
-from aws_cdk import (
-    aws_certificatemanager as acm,
-    aws_apigateway as apigateway,
-    aws_cognito as cognito,
-    aws_dynamodb as dynamodb,
-    aws_iam as iam,
-    aws_lambda as lambda_,
-    aws_route53 as route53,
-    aws_s3 as s3,
-    Duration,
-    Stack
-)
+from aws_cdk import CfnOutput, Duration, Stack
+from aws_cdk import aws_apigateway as apigateway
+from aws_cdk import aws_certificatemanager as acm
+from aws_cdk import aws_cognito as cognito
+from aws_cdk import aws_dynamodb as dynamodb
+from aws_cdk import aws_iam as iam
+from aws_cdk import aws_lambda as lambda_
+from aws_cdk import aws_route53 as route53
+from aws_cdk import aws_s3 as s3
 from constructs import Construct
 
-class ToadInTheHoleBackendStack(Stack):
+from stack.common import Component
+
+
+class ToadInTheHoleMainStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         domain_name = self.node.try_get_context('domain_name')
-        image_bucket = self.create_s3_bucket(construct_id)
-        recipe_table = self.create_dynamodb_table(construct_id)
+        environment = self.node.try_get_context('environment')
+        frontend_bucket, image_bucket = self.create_s3_buckets(environment)
+        recipe_table = self.create_dynamodb_table(environment)
         api_role, lambda_role = self.setup_iam(
-                construct_id,
+                environment,
                 image_bucket,
                 recipe_table)
-        user_pool = self.setup_cognito(construct_id)
+        user_pool = self.setup_cognito(environment)
         recipe_handler, collection_handler, image_handler = self.create_lambda_handlers(
-                construct_id,
+                environment,
                 lambda_role,
                 recipe_table)
-        api_certificate = self.create_certificate(construct_id, domain_name)
+        api_certificate = self.create_certificate(environment, domain_name)
         api = self.create_api_gateway(
-                construct_id,
+                environment,
                 domain_name,
                 api_role,
                 user_pool,
@@ -39,16 +40,34 @@ class ToadInTheHoleBackendStack(Stack):
                 image_handler,
                 image_bucket,
                 api_certificate)
+        self.create_exports(
+                environment,
+                api,
+                frontend_bucket,
+                image_bucket)
 
-    def create_s3_bucket(self, environment):
-        image_bucket = s3.Bucket(self, 'ToadInTheHoleImageBucket' + environment)
-        return image_bucket
+    def create_s3_buckets(self, environment):
+        frontend_bucket = s3.Bucket(
+                self,
+                Component.FRONTEND_BUCKET.get_component_name(environment),
+                website_index_document='index.html',
+                public_read_access=True,
+                block_public_access=s3.BlockPublicAccess(
+                    block_public_acls=False,
+                    block_public_policy=False,
+                    ignore_public_acls=False,
+                    restrict_public_buckets=False))
+
+        image_bucket = s3.Bucket(
+                self,
+                Component.IMAGE_BUCKET.get_component_name(environment))
+        return frontend_bucket, image_bucket
 
     def create_dynamodb_table(self, environment):
         recipe_table = dynamodb.TableV2(
                 self,
-                'ToadInTheHoleRecipeTable' + environment,
-                table_name='ToadInTheHoleRecipeTable' + environment,
+                Component.RECIPE_TABLE.get_component_name(environment),
+                table_name=Component.RECIPE_TABLE.get_component_name(environment),
                 partition_key=dynamodb.Attribute(name='slug', type=dynamodb.AttributeType.STRING),
                 billing=dynamodb.Billing.on_demand())
         return recipe_table
@@ -60,17 +79,17 @@ class ToadInTheHoleBackendStack(Stack):
             recipe_table):
         lambda_role = iam.Role(
                 self,
-                'ToadInTheHoleLambdaRole' + environment,
+                Component.LAMBDA_ROLE.get_component_name(environment),
                 assumed_by=iam.ServicePrincipal('lambda.amazonaws.com'))
 
         api_role = iam.Role(
                 self,
-                'ToadInTheHoleApiRole' + environment,
+                Component.API_ROLE.get_component_name(environment),
                 assumed_by=iam.ServicePrincipal('apigateway.amazonaws.com'))
 
         image_bucket_read_only_policy = iam.Policy(
                 self,
-                'ToadInTheHoleImageBucketReadOnlyPolicy' + environment,
+                Component.IMAGE_BUCKET_READ_ONLY_POLICY.get_component_name(environment),
                 statements=[
                     iam.PolicyStatement(
                         actions=['s3-bucket:GetObject'],
@@ -80,7 +99,7 @@ class ToadInTheHoleBackendStack(Stack):
 
         image_bucket_write_only_policy = iam.Policy(
                 self,
-                'ToadInTheHoleImageBucketWriteOnlyPolicy' + environment,
+                Component.IMAGE_BUCKET_WRITE_ONLY_POLICY.get_component_name(environment),
                 statements=[
                     iam.PolicyStatement(
                         actions=['s3-bucket:PutObject'],
@@ -90,7 +109,7 @@ class ToadInTheHoleBackendStack(Stack):
 
         recipe_table_read_write_policy = iam.Policy(
                 self,
-                'ToadInTheHoleRecipeTableReadWritePolicy' + environment,
+                Component.RECIPE_TABLE_READ_WRITE_POLICY.get_component_name(environment),
                 statements=[
                     iam.PolicyStatement(
                         actions=[
@@ -109,8 +128,8 @@ class ToadInTheHoleBackendStack(Stack):
     def setup_cognito(self, environment):
         user_pool = cognito.UserPool(
                 self,
-                'ToadInTheHoleUserPool' + environment,
-                user_pool_name='ToadInTheHoleUserPool' + environment,
+                Component.USER_POOL.get_component_name(environment),
+                user_pool_name=Component.USER_POOL.get_component_name(environment),
                 self_sign_up_enabled=False,
                 sign_in_case_sensitive=True,
                 sign_in_aliases=cognito.SignInAliases(email=True),
@@ -133,9 +152,9 @@ class ToadInTheHoleBackendStack(Stack):
                     require_symbols=True),
                 account_recovery=cognito.AccountRecovery.EMAIL_ONLY)
 
-        cognito_client = user_pool.add_client(
-                'ToadInTheHoleUserPoolClient' + environment,
-                user_pool_client_name='ToadInTheHoleUserPoolClient' + environment,
+        user_pool.add_client(
+                Component.USER_POOL_CLIENT.get_component_name(environment),
+                user_pool_client_name=Component.USER_POOL_CLIENT.get_component_name(environment),
                 o_auth=cognito.OAuthSettings(
                     flows=cognito.OAuthFlows(authorization_code_grant=True),
                     scopes=[cognito.OAuthScope.OPENID]),
@@ -159,19 +178,19 @@ class ToadInTheHoleBackendStack(Stack):
 
         recipe_handler = lambda_.Function(
                 self,
-                'ToadInTheHoleRecipeHandler' + environment,
+                Component.RECIPE_HANDLER.get_component_name(environment),
                 handler='recipe.handler',
                 **lambda_kwargs)
 
         collection_handler = lambda_.Function(
                 self,
-                'ToadInTheHoleRecipeCollectionHandler' + environment,
+                Component.COLLECTION_HANDLER.get_component_name(environment),
                 handler='recipe_collection.handler',
                 **lambda_kwargs)
 
         image_handler = lambda_.Function(
                 self,
-                'ToadInTheHoleImageHandler' + environment,
+                Component.IMAGE_HANDLER.get_component_name(environment),
                 handler='image.handler',
                 **lambda_kwargs)
 
@@ -190,18 +209,18 @@ class ToadInTheHoleBackendStack(Stack):
             certificate):
         authorizer = apigateway.CognitoUserPoolsAuthorizer(
                 self,
-                'ToadInTheHoleCognitoUserPoolAuthorizer' + environment,
+                Component.USER_POOL_AUTHORIZER.get_component_name(environment),
                 cognito_user_pools=[user_pool])
 
         api = apigateway.RestApi(
                 self,
-                'ToadInTheHoleApi' + environment,
-                rest_api_name='ToadInTheHoleApi' + environment,
+                Component.API.get_component_name(environment),
+                rest_api_name=Component.API.get_component_name(environment),
                 deploy=True)
 
         domain_name = apigateway.DomainName(
                 self,
-                'ToadInTheHoleApiDomainName' + environment,
+                Component.DOMAIN_NAME.get_component_name(environment),
                 mapping=api,
                 certificate=certificate,
                 domain_name='api.' + environment + '.' + domain_name)
@@ -262,14 +281,33 @@ class ToadInTheHoleBackendStack(Stack):
                 self,
                 'zone',
                 domain_name=domain_name)
-        env_certificate = acm.Certificate(
+        acm.Certificate(
                 self,
-                'ToadInTheHoleEnvironmentCertificate' + environment,
+                Component.ENVIRONMENT_CERTIFICATE.get_component_name(environment),
                 domain_name=environment + '.' + domain_name,
                 validation=acm.CertificateValidation.from_dns(zone))
+
         api_certificate = acm.Certificate(
                 self,
-                'ToadInTheHoleApiCertificate' + environment,
+                Component.API_CERTIFICATE.get_component_name(environment),
                 domain_name='api.' + environment + '.' + domain_name,
                 validation=acm.CertificateValidation.from_dns(zone))
+
         return api_certificate
+
+    def create_exports(self, environment, api, frontend_bucket, image_bucket):
+        CfnOutput(
+                self,
+                Component.API_EXPORT.get_component_name(environment),
+                export_name=Component.API_EXPORT.get_component_name(environment),
+                value=api.url)
+        CfnOutput(
+                self,
+                Component.FRONTEND_BUCKET_EXPORT.get_component_name(environment),
+                export_name=Component.FRONTEND_BUCKET_EXPORT.get_component_name(environment),
+                value=frontend_bucket.bucket_arn)
+        CfnOutput(
+                self,
+                Component.IMAGE_BUCKET_EXPORT.get_component_name(environment),
+                export_name=Component.IMAGE_BUCKET_EXPORT.get_component_name(environment),
+                value=image_bucket.bucket_arn)

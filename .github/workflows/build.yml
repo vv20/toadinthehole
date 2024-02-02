@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-backend:
+  build-main:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -40,10 +40,10 @@ jobs:
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'deploy'
-          cdk_stack: 'backend-dev'
-          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --exclusively'
+          cdk_stack: 'main-dev'
+          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=dev --exclusively'
 
-  build-frontend:
+  build-cdn:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -89,5 +89,5 @@ jobs:
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'deploy'
-          cdk_stack: 'frontend-dev'
-          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --exclusively'
+          cdk_stack: 'cdn-dev'
+          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=dev --exclusively'
