@@ -21,13 +21,11 @@ class ToadInTheHoleCDNStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
         domain_name = self.node.try_get_context('domain_name')
         environment = self.node.try_get_context('environment')
-        api_url = self.lookup_api_url(environment)
         frontend_bucket, image_bucket = self.lookup_s3_buckets(environment)
         zone = self.lookup_zone(domain_name)
         frontend_certificate = self.create_certificate(environment, domain_name, zone)
         distribution = self.create_cdn_distribution(
                 environment,
-                api_url,
                 domain_name,
                 frontend_bucket,
                 image_bucket,
@@ -50,11 +48,6 @@ class ToadInTheHoleCDNStack(Stack):
 
         return frontend_bucket, image_bucket
 
-    def lookup_api_url(self, environment):
-        full_api_url = Fn.import_value(Component.API_EXPORT.get_component_name(environment))
-        parsed_url = urlparse(full_api_url)
-        return parsed_url.netloc
-
     def lookup_zone(self, domain_name):
         return route53.HostedZone.from_lookup(
                 self,
@@ -72,7 +65,6 @@ class ToadInTheHoleCDNStack(Stack):
     def create_cdn_distribution(
             self,
             environment,
-            api_url,
             domain_name,
             frontend_bucket,
             image_bucket,
@@ -97,7 +89,7 @@ class ToadInTheHoleCDNStack(Stack):
                             image_bucket,
                             origin_access_identity=oai)),
                     '/api/*': cloudfront.BehaviorOptions(
-                        origin=cloudfront_origins.HttpOrigin(api_url))
+                        origin=cloudfront_origins.HttpOrigin('api.' + environment + '.' + domain_name))
                 },
                 certificate=frontend_certificate,
                 domain_names=['www.' + environment + '.' + domain_name])

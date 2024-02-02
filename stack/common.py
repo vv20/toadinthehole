@@ -7,7 +7,6 @@ class Component(Enum):
     ALIAS_RECORD                   = 'alias_record'
     API                            = 'api'
     API_CERTIFICATE                = 'api_certificate'
-    API_EXPORT                     = 'api_export'
     API_ROLE                       = 'api_role'
     COLLECTION_HANDLER             = 'collection_handler'
     DISTRIBUTION                   = 'distribution'

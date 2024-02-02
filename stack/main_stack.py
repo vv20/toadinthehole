@@ -298,11 +298,6 @@ class ToadInTheHoleMainStack(Stack):
     def create_exports(self, environment, api, frontend_bucket, image_bucket):
         CfnOutput(
                 self,
-                Component.API_EXPORT.get_component_name(environment),
-                export_name=Component.API_EXPORT.get_component_name(environment),
-                value=api.url)
-        CfnOutput(
-                self,
                 Component.FRONTEND_BUCKET_EXPORT.get_component_name(environment),
                 export_name=Component.FRONTEND_BUCKET_EXPORT.get_component_name(environment),
                 value=frontend_bucket.bucket_arn)
