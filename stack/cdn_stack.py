@@ -55,6 +55,12 @@ class ToadInTheHoleCDNStack(Stack):
                 domain_name=domain_name)
 
     def create_certificate(self, environment, domain_name, zone):
+        acm.Certificate(
+                self,
+                Component.ENVIRONMENT_CERTIFICATE.get_component_name(environment),
+                domain_name=environment + '.' + domain_name,
+                validation=acm.CertificateValidation.from_dns(zone))
+
         frontend_certificate = acm.Certificate(
                 self,
                 Component.FRONTEND_CERTIFICATE.get_component_name(environment),
