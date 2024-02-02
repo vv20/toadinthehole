@@ -1,4 +1,5 @@
 from os.path import exists
+from urllib.parse import urlparse
 
 from aws_cdk import Fn, Stack
 from aws_cdk import aws_apigateway as apigateway
@@ -50,7 +51,9 @@ class ToadInTheHoleCDNStack(Stack):
         return frontend_bucket, image_bucket
 
     def lookup_api_url(self, environment):
-        return Fn.import_value(Component.API_EXPORT.get_component_name(environment))
+        full_api_url = Fn.import_value(Component.API_EXPORT.get_component_name(environment))
+        parsed_url = urlparse(full_api_url)
+        return parsed_url.netloc
 
     def lookup_zone(self, domain_name):
         return route53.HostedZone.from_lookup(
