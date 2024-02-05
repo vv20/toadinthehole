@@ -7,24 +7,17 @@ from stack.cdn_stack import ToadInTheHoleCDNStack
 from stack.main_stack import ToadInTheHoleMainStack
 
 app = cdk.App()
-ToadInTheHoleCDNStack(
-        app,
-        'cdn-dev',
-        cross_region_references=True,
-        env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')))
+
+environment = app.node.try_get_context('environment')
+
 ToadInTheHoleMainStack(
         app,
-        'main-dev',
+        'main-' + environment,
         cross_region_references=True,
         env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')))
 ToadInTheHoleCDNStack(
         app,
-        'cdn-prod',
+        'cdn-' + environment,
         cross_region_references=True,
-        env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')))
-ToadInTheHoleMainStack(
-        app,
-        'main-prod',
-        cross_region_references=True,
-        env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')))
+        env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region='us-east-1'))
 app.synth()
