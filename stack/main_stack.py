@@ -1,12 +1,18 @@
-from aws_cdk import CfnOutput, Duration, Stack
+from os.path import exists
+
+from aws_cdk import CfnOutput, Duration, Fn, Stack
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_certificatemanager as acm
+from aws_cdk import aws_cloudfront as cloudfront
+from aws_cdk import aws_cloudfront_origins as cloudfront_origins
 from aws_cdk import aws_cognito as cognito
 from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as lambda_
 from aws_cdk import aws_route53 as route53
+from aws_cdk import aws_route53_targets as route53_targets
 from aws_cdk import aws_s3 as s3
+from aws_cdk import aws_s3_deployment as s3_deployment
 from constructs import Construct
 
 from stack.common import Component
@@ -29,7 +35,9 @@ class ToadInTheHoleMainStack(Stack):
                 environment,
                 lambda_role,
                 recipe_table)
-        api_certificate = self.create_certificate(environment, domain_name)
+        zone = self.lookup_zone(domain_name)
+        api_certificate = self.create_certificate(environment, domain_name, zone)
+        frontend_certificate = self.lookup_frontend_certificate(environment)
         api = self.create_api_gateway(
                 environment,
                 domain_name,
@@ -40,11 +48,15 @@ class ToadInTheHoleMainStack(Stack):
                 image_handler,
                 image_bucket,
                 api_certificate)
-        self.create_exports(
+        distribution = self.create_cdn_distribution(
                 environment,
+                domain_name,
                 api,
                 frontend_bucket,
-                image_bucket)
+                image_bucket,
+                frontend_certificate)
+        self.configure_dns(environment, domain_name, zone, distribution)
+        self.create_frontend_deployment(environment, frontend_bucket)
 
     def create_s3_buckets(self, environment):
         frontend_bucket = s3.Bucket(
@@ -276,11 +288,13 @@ class ToadInTheHoleMainStack(Stack):
 
         return api
 
-    def create_certificate(self, environment, domain_name):
-        zone = route53.HostedZone.from_lookup(
+    def lookup_zone(self, domain_name):
+        return route53.HostedZone.from_lookup(
                 self,
                 'zone',
                 domain_name=domain_name)
+
+    def create_certificate(self, environment, domain_name, zone):
         acm.Certificate(
                 self,
                 Component.ENVIRONMENT_CERTIFICATE.get_component_name(environment),
@@ -295,14 +309,63 @@ class ToadInTheHoleMainStack(Stack):
 
         return api_certificate
 
-    def create_exports(self, environment, api, frontend_bucket, image_bucket):
-        CfnOutput(
+    def lookup_frontend_certificate(self, environment):
+        frontend_certificate_arn = Fn.import_value(Component.FRONTEND_CERTIFICATE_EXPORT.get_component_name(environment))
+        return acm.Certificate.from_certificate_arn(
                 self,
-                Component.FRONTEND_BUCKET_EXPORT.get_component_name(environment),
-                export_name=Component.FRONTEND_BUCKET_EXPORT.get_component_name(environment),
-                value=frontend_bucket.bucket_arn)
-        CfnOutput(
+                Component.FRONTEND_CERTIFICATE.get_component_name(environment),
+                frontend_certificate_arn)
+
+    def create_cdn_distribution(
+            self,
+            environment,
+            domain_name,
+            api,
+            frontend_bucket,
+            image_bucket,
+            frontend_certificate):
+        oai = cloudfront.OriginAccessIdentity(
                 self,
-                Component.IMAGE_BUCKET_EXPORT.get_component_name(environment),
-                export_name=Component.IMAGE_BUCKET_EXPORT.get_component_name(environment),
-                value=image_bucket.bucket_arn)
+                Component.ORIGIN_ACCESS_IDENTITY.get_component_name(environment))
+        frontend_bucket.grant_read(oai)
+        image_bucket.grant_read(oai)
+
+        distribution = cloudfront.Distribution(
+                self,
+                Component.DISTRIBUTION.get_component_name(environment),
+                default_root_object='index.html',
+                default_behavior=cloudfront.BehaviorOptions(
+                    origin=cloudfront_origins.S3Origin(
+                        frontend_bucket,
+                        origin_access_identity=oai)),
+                additional_behaviors={
+                    '/image/*': cloudfront.BehaviorOptions(
+                        origin=cloudfront_origins.S3Origin(
+                            image_bucket,
+                            origin_access_identity=oai)),
+                    '/api/*': cloudfront.BehaviorOptions(
+                        origin=cloudfront_origins.RestApiOrigin(api))
+                },
+                certificate=frontend_certificate,
+                domain_names=['www.' + environment + '.' + domain_name])
+
+        return distribution
+
+    def configure_dns(self, environment, domain_name, zone, distribution):
+        route53.ARecord(
+                self,
+                Component.ALIAS_RECORD.get_component_name(environment),
+                zone=zone,
+                record_name='www.' + environment + '.' + domain_name,
+                target=route53.RecordTarget.from_alias(
+                    route53_targets.CloudFrontTarget(distribution)))
+
+    def create_frontend_deployment(self, environment, frontend_bucket):
+        if not exists('frontend/build'):
+            return
+        s3_deployment.BucketDeployment(
+                self,
+                Component.FRONTEND_DEPLOYMENT.get_component_name(environment),
+                sources=[s3_deployment.Source.asset('frontend/build')],
+                destination_bucket=frontend_bucket,
+                retain_on_delete=False)
