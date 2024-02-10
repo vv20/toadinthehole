@@ -1,4 +1,4 @@
-from aws_cdk import CfnOutput, Stack
+from aws_cdk import Stack
 from aws_cdk import aws_certificatemanager as acm
 from aws_cdk import aws_route53 as route53
 from constructs import Construct
@@ -14,7 +14,7 @@ class ToadInTheHoleCDNStack(Stack):
         environment = self.node.try_get_context('environment')
         zone = self.lookup_zone(domain_name)
         frontend_certificate = self.create_certificate(environment, domain_name, zone)
-        self.create_exports(environment, frontend_certificate)
+        self.frontend_certificate_arn = frontend_certificate.certificate_arn
 
     def lookup_zone(self, domain_name):
         return route53.HostedZone.from_lookup(
@@ -35,10 +35,3 @@ class ToadInTheHoleCDNStack(Stack):
                 domain_name='www.' + environment + '.' + domain_name,
                 validation=acm.CertificateValidation.from_dns(zone))
         return frontend_certificate
-
-    def create_exports(self, environment, frontend_certificate):
-        CfnOutput(
-                self,
-                Component.FRONTEND_CERTIFICATE_EXPORT.get_component_name(environment),
-                export_name=Component.FRONTEND_CERTIFICATE_EXPORT.get_component_name(environment),
-                value=frontend_certificate.certificate_arn)

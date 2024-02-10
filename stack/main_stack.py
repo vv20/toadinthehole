@@ -20,7 +20,12 @@ from stack.common import Component
 
 class ToadInTheHoleMainStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(
+            self,
+            scope,
+            construct_id,
+            frontend_certificate_arn,
+            **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         domain_name = self.node.try_get_context('domain_name')
         environment = self.node.try_get_context('environment')
@@ -37,7 +42,7 @@ class ToadInTheHoleMainStack(Stack):
                 recipe_table)
         zone = self.lookup_zone(domain_name)
         api_certificate = self.create_certificate(environment, domain_name, zone)
-        frontend_certificate = self.lookup_frontend_certificate(environment)
+        frontend_certificate = self.lookup_frontend_certificate(environment, frontend_certificate_arn)
         api = self.create_api_gateway(
                 environment,
                 domain_name,
@@ -309,8 +314,10 @@ class ToadInTheHoleMainStack(Stack):
 
         return api_certificate
 
-    def lookup_frontend_certificate(self, environment):
-        frontend_certificate_arn = Fn.import_value(Component.FRONTEND_CERTIFICATE_EXPORT.get_component_name(environment))
+    def lookup_frontend_certificate(
+            self,
+            environment,
+            frontend_certificate_arn):
         return acm.Certificate.from_certificate_arn(
                 self,
                 Component.FRONTEND_CERTIFICATE.get_component_name(environment),
