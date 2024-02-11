@@ -45,13 +45,32 @@ jobs:
           cd frontend
           npm ci
 
-      - name: Build Frontend
-        run: |
-          cd frontend
-          npm run build:dev
-
-      - name: Build Stacks
+      - name: Build CDN Stack
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'deploy'
+          cdk_stack: 'cdn-dev'
+          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=dev --exclusively'
+
+      - name: Build Main Stack
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'deploy'
+          cdk_stack: 'cdn-main'
+          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=dev --exclusively'
+
+      - name: Configure Amplify
+        run: |
+          python stack/create_amplify_config.py
+
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Build Frontend Deployment Stack
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'deploy'
+          cdk_stack: 'cdn-main'
           cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=dev --exclusively'

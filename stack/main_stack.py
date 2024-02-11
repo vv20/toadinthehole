@@ -1,5 +1,3 @@
-from os.path import exists
-
 from aws_cdk import CfnOutput, Duration, Fn, Stack
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_certificatemanager as acm
@@ -12,7 +10,6 @@ from aws_cdk import aws_lambda as lambda_
 from aws_cdk import aws_route53 as route53
 from aws_cdk import aws_route53_targets as route53_targets
 from aws_cdk import aws_s3 as s3
-from aws_cdk import aws_s3_deployment as s3_deployment
 from constructs import Construct
 
 from stack.common import Component
@@ -61,7 +58,7 @@ class ToadInTheHoleMainStack(Stack):
                 image_bucket,
                 frontend_certificate)
         self.configure_dns(environment, domain_name, zone, distribution)
-        self.create_frontend_deployment(environment, frontend_bucket)
+        self.frontend_bucket_arn = frontend_bucket.bucket_arn
 
     def create_s3_buckets(self, environment):
         frontend_bucket = s3.Bucket(
@@ -366,13 +363,3 @@ class ToadInTheHoleMainStack(Stack):
                 record_name='www.' + environment + '.' + domain_name,
                 target=route53.RecordTarget.from_alias(
                     route53_targets.CloudFrontTarget(distribution)))
-
-    def create_frontend_deployment(self, environment, frontend_bucket):
-        if not exists('frontend/build'):
-            return
-        s3_deployment.BucketDeployment(
-                self,
-                Component.FRONTEND_DEPLOYMENT.get_component_name(environment),
-                sources=[s3_deployment.Source.asset('frontend/build')],
-                destination_bucket=frontend_bucket,
-                retain_on_delete=False)
