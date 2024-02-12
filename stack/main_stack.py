@@ -58,7 +58,7 @@ class ToadInTheHoleMainStack(Stack):
                 image_bucket,
                 frontend_certificate)
         self.configure_dns(environment, domain_name, zone, distribution)
-        self.frontend_bucket_arn = frontend_bucket.bucket_arn
+        self.create_exports(environment, frontend_bucket)
 
     def create_s3_buckets(self, environment):
         frontend_bucket = s3.Bucket(
@@ -363,3 +363,10 @@ class ToadInTheHoleMainStack(Stack):
                 record_name='www.' + environment + '.' + domain_name,
                 target=route53.RecordTarget.from_alias(
                     route53_targets.CloudFrontTarget(distribution)))
+
+    def create_exports(self, environment, frontend_bucket):
+        CfnOutput(
+                self,
+                Component.FRONTEND_BUCKET_EXPORT.get_component_name(environment),
+                export_name=Component.FRONTEND_BUCKET_EXPORT.get_component_name(environment),
+                value=frontend_bucket.bucket_arn)
