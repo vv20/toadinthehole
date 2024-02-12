@@ -3,19 +3,13 @@ import { getCurrentUser } from "aws-amplify/auth";
 import { useEffect, useState } from "react";
 
 import "./App.css";
-import logo from "./logo.svg";
 
 import LoginPage from "./LoginPage";
+import Main from "./Main";
 
-Amplify.configure({
-  Auth: {
-    Cognito: {
-      userPoolId: "eu-west-2_14DbX1xkG",
-      userPoolClientId: "1sn1af1lbustougtitif6ib08f",
-      signUpVerificationMethod: "link",
-    },
-  },
-});
+import amplifyconfiguration from "./amplifyconfiguration.json";
+
+Amplify.configure(amplifyconfiguration);
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -44,7 +38,7 @@ function App() {
   } else {
     return (
       <div className="App">
-        <img src={logo} className="App-logo" alt="logo" />
+        <Main />
       </div>
     );
   }
