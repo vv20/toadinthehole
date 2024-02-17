@@ -30,7 +30,6 @@ function LoginForm({
         password: formData.password,
       });
 
-      console.log(nextStep);
       switch (nextStep.signInStep) {
         case "DONE": {
           setIsLoggedIn(true);

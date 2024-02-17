@@ -17,8 +17,7 @@ function App() {
   useEffect(() => {
     const checkLogIn = async () => {
       try {
-        const { username } = await getCurrentUser();
-        console.log(username);
+        await getCurrentUser();
         setIsLoggedIn(true);
       } catch (e) {
         console.log(e);

@@ -3,7 +3,7 @@ from aws_cdk import aws_certificatemanager as acm
 from aws_cdk import aws_route53 as route53
 from constructs import Construct
 
-from stack.common import Component
+from stack.common import Component, Domain, get_environment_domain
 
 
 class ToadInTheHoleCDNStack(Stack):
@@ -26,12 +26,12 @@ class ToadInTheHoleCDNStack(Stack):
         acm.Certificate(
                 self,
                 Component.ENVIRONMENT_CERTIFICATE.get_component_name(environment),
-                domain_name=environment + '.' + domain_name,
+                domain_name=get_environment_domain(environment, domain_name),
                 validation=acm.CertificateValidation.from_dns(zone))
 
         frontend_certificate = acm.Certificate(
                 self,
                 Component.FRONTEND_CERTIFICATE.get_component_name(environment),
-                domain_name='www.' + environment + '.' + domain_name,
+                domain_name=Domain.FRONTEND.get_domain_name(environment, domain_name),
                 validation=acm.CertificateValidation.from_dns(zone))
         return frontend_certificate

@@ -12,7 +12,7 @@ from aws_cdk import aws_route53_targets as route53_targets
 from aws_cdk import aws_s3 as s3
 from constructs import Construct
 
-from stack.common import Component
+from stack.common import Component, Domain, get_environment_domain
 
 
 class ToadInTheHoleMainStack(Stack):
@@ -53,11 +53,10 @@ class ToadInTheHoleMainStack(Stack):
         distribution = self.create_cdn_distribution(
                 environment,
                 domain_name,
-                api,
                 frontend_bucket,
                 image_bucket,
                 frontend_certificate)
-        self.configure_dns(environment, domain_name, zone, distribution)
+        self.configure_dns(environment, domain_name, zone, distribution, api)
         self.create_exports(environment, frontend_bucket)
 
     def create_s3_buckets(self, environment):
@@ -230,14 +229,10 @@ class ToadInTheHoleMainStack(Stack):
                 self,
                 Component.API.get_component_name(environment),
                 rest_api_name=Component.API.get_component_name(environment),
+                domain_name=apigateway.DomainNameOptions(
+                    certificate=certificate,
+                    domain_name=Domain.API.get_domain_name(environment, domain_name)),
                 deploy=True)
-
-        domain_name = apigateway.DomainName(
-                self,
-                Component.DOMAIN_NAME.get_component_name(environment),
-                mapping=api,
-                certificate=certificate,
-                domain_name='api.' + environment + '.' + domain_name)
 
         recipe_resource     = api.root.add_resource('recipe')
         collection_resource = api.root.add_resource('collection')
@@ -300,13 +295,13 @@ class ToadInTheHoleMainStack(Stack):
         acm.Certificate(
                 self,
                 Component.ENVIRONMENT_CERTIFICATE.get_component_name(environment),
-                domain_name=environment + '.' + domain_name,
+                domain_name=get_environment_domain(environment, domain_name),
                 validation=acm.CertificateValidation.from_dns(zone))
 
         api_certificate = acm.Certificate(
                 self,
                 Component.API_CERTIFICATE.get_component_name(environment),
-                domain_name='api.' + environment + '.' + domain_name,
+                domain_name=Domain.API.get_domain_name(environment, domain_name),
                 validation=acm.CertificateValidation.from_dns(zone))
 
         return api_certificate
@@ -324,7 +319,6 @@ class ToadInTheHoleMainStack(Stack):
             self,
             environment,
             domain_name,
-            api,
             frontend_bucket,
             image_bucket,
             frontend_certificate):
@@ -346,23 +340,28 @@ class ToadInTheHoleMainStack(Stack):
                     '/image/*': cloudfront.BehaviorOptions(
                         origin=cloudfront_origins.S3Origin(
                             image_bucket,
-                            origin_access_identity=oai)),
-                    '/api/*': cloudfront.BehaviorOptions(
-                        origin=cloudfront_origins.RestApiOrigin(api))
+                            origin_access_identity=oai))
                 },
                 certificate=frontend_certificate,
-                domain_names=['www.' + environment + '.' + domain_name])
+                domain_names=[Domain.FRONTEND.get_domain_name(environment, domain_name)])
 
         return distribution
 
-    def configure_dns(self, environment, domain_name, zone, distribution):
+    def configure_dns(self, environment, domain_name, zone, distribution, api):
         route53.ARecord(
                 self,
-                Component.ALIAS_RECORD.get_component_name(environment),
+                Component.FRONTEND_ALIAS_RECORD.get_component_name(environment),
                 zone=zone,
-                record_name='www.' + environment + '.' + domain_name,
+                record_name=Domain.FRONTEND.get_domain_name(environment, domain_name),
                 target=route53.RecordTarget.from_alias(
                     route53_targets.CloudFrontTarget(distribution)))
+        route53.ARecord(
+                self,
+                Component.API_ALIAS_RECORD.get_component_name(environment),
+                zone=zone,
+                record_name=Domain.API.get_domain_name(environment, domain_name),
+                target=route53.RecordTarget.from_alias(
+                    route53_targets.ApiGateway(api)))
 
     def create_exports(self, environment, frontend_bucket):
         CfnOutput(

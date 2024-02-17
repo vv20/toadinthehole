@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import { get } from "aws-amplify/api";
-import { ReactNode } from "react";
+import { fetchAuthSession } from "aws-amplify/auth";
+import { ReactNode, useEffect, useState } from "react";
 
 import RecipePreview from "./RecipePreview";
 
@@ -12,9 +12,16 @@ function RecipeList() {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
+        const { idToken } = (await fetchAuthSession()).tokens ?? {};
+        const options = {
+          headers: {
+            Authorization: `${idToken?.toString()}`,
+          },
+        };
         const restOperation = get({
-          apiName: "",
-          path: "",
+          apiName: "ToadInTheHoleAPI",
+          path: "/recipes",
+          options: options,
         });
         const { body } = await restOperation.response;
         const responseJson: any[] = Array.of(await body.json());
