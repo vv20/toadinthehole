@@ -232,6 +232,9 @@ class ToadInTheHoleMainStack(Stack):
                 domain_name=apigateway.DomainNameOptions(
                     certificate=certificate,
                     domain_name=Domain.API.get_domain_name(environment, domain_name)),
+                default_cors_preflight_options=apigateway.CorsOptions(
+                    allow_origins=['https://' + Domain.FRONTEND.get_domain_name(environment, domain_name) + ':8080'],
+                    allow_credentials=True),
                 deploy=True)
 
         recipe_resource     = api.root.add_resource('recipe')

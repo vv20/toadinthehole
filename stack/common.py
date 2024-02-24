@@ -12,7 +12,6 @@ class Component(Enum):
     API_ROLE                       = 'api_role'
     COLLECTION_HANDLER             = 'collection_handler'
     DISTRIBUTION                   = 'distribution'
-    DOMAIN_NAME                    = 'domain_name'
     FRONTEND_ALIAS_RECORD          = 'frontend_alias_record'
     FRONTEND_BUCKET                = 'frontend_bucket'
     FRONTEND_BUCKET_EXPORT         = 'frontend_bucket_export'
