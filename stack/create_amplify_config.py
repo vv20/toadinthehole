@@ -19,6 +19,7 @@ def create_amplify_config(environment):
         template['API']['REST']['ToadInTheHoleAPI']['region'] = region
         template['API']['REST']['ToadInTheHoleAPI']['endpoint'] = 'https://' + Domain.API.get_domain_name(environment, domain_name) + '/prod'
         with open('frontend/src/amplifyconfiguration.json', 'w') as output_file:
+            print(json.dumps(template))
             json.dump(fp=output_file, obj=template)
 
 if __name__ == '__main__':

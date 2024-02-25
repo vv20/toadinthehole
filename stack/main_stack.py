@@ -26,6 +26,7 @@ class ToadInTheHoleMainStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
         domain_name = self.node.try_get_context('domain_name')
         environment = self.node.try_get_context('environment')
+        localhost_access = bool(self.node.try_get_context('localhost_access'))
         frontend_bucket, image_bucket = self.create_s3_buckets(environment)
         recipe_table = self.create_dynamodb_table(environment)
         api_role, lambda_role = self.setup_iam(
@@ -49,7 +50,8 @@ class ToadInTheHoleMainStack(Stack):
                 collection_handler,
                 image_handler,
                 image_bucket,
-                api_certificate)
+                api_certificate,
+                localhost_access)
         distribution = self.create_cdn_distribution(
                 environment,
                 domain_name,
@@ -219,11 +221,16 @@ class ToadInTheHoleMainStack(Stack):
             collection_handler,
             image_handler,
             image_bucket,
-            certificate):
+            certificate,
+            localhost_access):
         authorizer = apigateway.CognitoUserPoolsAuthorizer(
                 self,
                 Component.USER_POOL_AUTHORIZER.get_component_name(environment),
                 cognito_user_pools=[user_pool])
+
+        cors_origins = ['https://' + Domain.FRONTEND.get_domain_name(environment, domain_name) + ':8080']
+        if (localhost_access):
+            cors_origins.append('https://localhost:3000')
 
         api = apigateway.RestApi(
                 self,
@@ -233,7 +240,7 @@ class ToadInTheHoleMainStack(Stack):
                     certificate=certificate,
                     domain_name=Domain.API.get_domain_name(environment, domain_name)),
                 default_cors_preflight_options=apigateway.CorsOptions(
-                    allow_origins=['https://' + Domain.FRONTEND.get_domain_name(environment, domain_name) + ':8080'],
+                    allow_origins=cors_origins,
                     allow_credentials=True),
                 deploy=True)
 

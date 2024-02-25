@@ -57,7 +57,7 @@ jobs:
         with:
           cdk_subcommand: 'deploy'
           cdk_stack: 'main-dev'
-          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=dev --exclusively'
+          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=dev --exclusively --context localhost_access=true'
 
       - name: Configure Amplify
         run: |
