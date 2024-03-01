@@ -36,6 +36,7 @@ class ToadInTheHoleMainStack(Stack):
         user_pool = self.setup_cognito(environment)
         recipe_handler, collection_handler, image_handler = self.create_lambda_handlers(
                 environment,
+                api_role,
                 lambda_role,
                 recipe_table)
         zone = self.lookup_zone(domain_name)
@@ -102,16 +103,6 @@ class ToadInTheHoleMainStack(Stack):
                 Component.API_ROLE.get_component_name(environment),
                 assumed_by=iam.ServicePrincipal('apigateway.amazonaws.com'))
 
-        image_bucket_read_only_policy = iam.Policy(
-                self,
-                Component.IMAGE_BUCKET_READ_ONLY_POLICY.get_component_name(environment),
-                statements=[
-                    iam.PolicyStatement(
-                        actions=['s3-bucket:GetObject'],
-                        resources=[image_bucket.bucket_arn]
-                    )])
-        image_bucket_read_only_policy.attach_to_role(api_role)
-
         image_bucket_write_only_policy = iam.Policy(
                 self,
                 Component.IMAGE_BUCKET_WRITE_ONLY_POLICY.get_component_name(environment),
@@ -135,9 +126,9 @@ class ToadInTheHoleMainStack(Stack):
                             'dynamodb-table:Query',
                             'dynamodb-table:Scan',
                             'dynamodb-table:UpdateItem'],
-                        resources=[recipe_table.table_arn]
-                    )])
+                        resources=[recipe_table.table_arn])])
         recipe_table_read_write_policy.attach_to_role(lambda_role)
+
         return api_role, lambda_role
 
     def setup_cognito(self, environment):
@@ -181,7 +172,12 @@ class ToadInTheHoleMainStack(Stack):
 
         return user_pool
 
-    def create_lambda_handlers(self, environment, lambda_role, recipe_table):
+    def create_lambda_handlers(
+            self,
+            environment,
+            api_role,
+            lambda_role,
+            recipe_table):
         lambda_kwargs = {
                 'code'       : lambda_.Code.from_asset('backend'),
                 'role'       : lambda_role,
@@ -208,6 +204,19 @@ class ToadInTheHoleMainStack(Stack):
                 Component.IMAGE_HANDLER.get_component_name(environment),
                 handler='image.handler',
                 **lambda_kwargs)
+
+        lambda_invocation_policy = iam.Policy(
+                self,
+                Component.LAMBDA_EXECUTION_POLICY.get_component_name(environment),
+                statements=[
+                    iam.PolicyStatement(
+                        actions=[
+                            'lambda:InvokeFunction'],
+                        resources=[
+                            recipe_handler.function_arn,
+                            collection_handler.function_arn,
+                            image_handler.function_arn])])
+        lambda_invocation_policy.attach_to_role(api_role)
 
         return recipe_handler, collection_handler, image_handler
 

@@ -23,6 +23,7 @@ class Component(Enum):
     IMAGE_BUCKET_WRITE_ONLY_POLICY = 'image_bucket_write_only_policy'
     IMAGE_HANDLER                  = 'image_handler'
     LAMBDA_ROLE                    = 'lambda_role'
+    LAMBDA_EXECUTION_POLICY        = 'lambda_execution_policy'
     ORIGIN_ACCESS_IDENTITY         = 'origin_access_identity'
     RECIPE_HANDLER                 = 'recipe_handler'
     RECIPE_TABLE                   = 'recipe_table'
