@@ -20,7 +20,7 @@ function RecipeList() {
         };
         const restOperation = get({
           apiName: "ToadInTheHoleAPI",
-          path: "/recipes",
+          path: "/collection",
           options: options,
         });
         const { body } = await restOperation.response;
