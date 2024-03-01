@@ -6,14 +6,14 @@ def get_recipe_collection(event):
         collection = RecipeCollection()
     else:
         collection = RecipeCollection(event['queryStringParameters']['tags'])
-    return build_response_body(200, str(collections.recipes))
+    return build_response_body(200, str(collection.recipes))
 
 methodDict = {
         'GET': get_recipe_collection,
 }
 
 def handler(event, context):
-    if event.httpMethod not in methodDict:
+    if event['httpMethod'] not in methodDict:
         return build_response_body(400, "HTTP method not supported")
     try:
         return methodDict[event.httpMethod](event)
