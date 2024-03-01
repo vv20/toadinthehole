@@ -33,6 +33,6 @@ def handler(event, context):
     if event['httpMethod'] not in methodDict:
         return build_response_body(400, "HTTP method not supported")
     try:
-        return methodDict[event.httpMethod](event)
+        return methodDict[event['httpMethod']](event)
     except:
         return build_response_body(500, "Internal Server Error")
