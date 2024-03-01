@@ -119,13 +119,13 @@ class ToadInTheHoleMainStack(Stack):
                 statements=[
                     iam.PolicyStatement(
                         actions=[
-                            'dynamodb-table:BatchGetItem',
-                            'dynamodb-table:DeleteItem',
-                            'dynamodb-table:GetItem',
-                            'dynamodb-table:PutItem',
-                            'dynamodb-table:Query',
-                            'dynamodb-table:Scan',
-                            'dynamodb-table:UpdateItem'],
+                            'dynamodb:BatchGetItem',
+                            'dynamodb:DeleteItem',
+                            'dynamodb:GetItem',
+                            'dynamodb:PutItem',
+                            'dynamodb:Query',
+                            'dynamodb:Scan',
+                            'dynamodb:UpdateItem'],
                         resources=[recipe_table.table_arn])])
         recipe_table_read_write_policy.attach_to_role(lambda_role)
 

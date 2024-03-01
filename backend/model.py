@@ -24,13 +24,13 @@ class Recipe:
             self.description = queryResponse['item']['description']
             self.image_id = queryResponse['item']['image_id']
             self.tags = queryResponse['item']['tags']
-            self.exists = true
+            self.exists = True
         else:
             self.name = ''
             self.description = ''
             self.image_id = ''
             self.tags = []
-            self.exists = false
+            self.exists = False
 
     def __str__(self):
         return json.dumps({
@@ -71,12 +71,12 @@ class Recipe:
                 Key={
                     'slug': self.slug
                 })
-        self.exists = false
+        self.exists = False
 
 
 class RecipeCollection:
     def __new__(self, tags=[]):
-        table = dynamodb.Table(os.environ['RECIPE_TABLE_NAME'])
+        self.table = dynamodb.Table(os.environ['RECIPE_TABLE_NAME'])
         condition = None
         queryResult = None
         if tags and len(self.tags) > 0:
