@@ -61,7 +61,7 @@ jobs:
 
       - name: Configure Amplify
         run: |
-          python stack/create_amplify_config.py dev
+          python stack/create_amplify_config.py dev ${{ vars.AWS_REGION }} ${{ vars.DEPLOYMENT_DOMAIN_NAME }}
 
       - name: Build Frontend
         run: |
