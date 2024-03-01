@@ -2,7 +2,7 @@ from common import build_response_body
 from model import Recipe
 
 def get_recipe(event):
-    if not event['queryStringParameters'] or not event['queryStringParameters']['recipe']:
+    if 'queryStringParameters' in event and 'recipe' in event['queryStringParameters']:
         return build_response_body(400, 'Missing recipe ID')
     recipe = Recipe(event['queryStringParameters']['recipe'])
     if not recipe.exists:
@@ -15,7 +15,7 @@ def save_recipe(event):
     return build_response_body(201, 'OK')
 
 def delete_recipe(event):
-    if not event['queryStringParameters'] or not event['queryStringParameters']['recipe']:
+    if not 'queryStringParameters' in event or not 'recipe' in event['queryStringParameters']:
         return build_response_body(400, 'Missing recipe ID')
     recipe = Recipe(event['queryStringParameters']['recipe'])
     if not recipe.exists:

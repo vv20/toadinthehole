@@ -2,10 +2,10 @@ from common import build_response_body
 from model import RecipeCollection
 
 def get_recipe_collection(event):
-    if not event['queryStringParameters'] or not event['queryStringParameters']['tags']:
-        collection = RecipeCollection()
-    else:
+    if 'queryStringParameters' in event and 'tags' in event['queryStringParameters']:
         collection = RecipeCollection(event['queryStringParameters']['tags'])
+    else:
+        collection = RecipeCollection()
     return build_response_body(200, str(collection.recipes))
 
 methodDict = {
