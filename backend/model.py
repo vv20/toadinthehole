@@ -1,29 +1,29 @@
-import boto3
 import json
 import os
+
+import boto3
+from boto3.dynamodb.conditions import Attr, Or
 
 dynamodb = boto3.resource('dynamodb')
 
 class Recipe:
-    def __new__(self, slug, item=None):
+    def __init__(self, slug, item=None):
         self.table = dynamodb.Table(os.environ['RECIPE_TABLE_NAME'])
         self.slug = slug
-        self.item = None
-        if not item:
+        self.item = item
+        if item is None:
             queryResponse = self.table.get_item(
-                    Key = {
-                        'slug': slug
-                    }
+                Key = {
+                    'slug': slug
+                }
             )
-            if 'item' in queryResponse:
-                self.item = queryResponse['item']
-        else:
-            self.item = item
+            if 'Item' in queryResponse:
+                self.item = queryResponse['Item']
         if self.item:
-            self.name = queryResponse['item']['name']
-            self.description = queryResponse['item']['description']
-            self.image_id = queryResponse['item']['image_id']
-            self.tags = queryResponse['item']['tags']
+            self.name = self.item['name']
+            self.description = self.item['description']
+            self.image_id = self.item['image_id']
+            self.tags = self.item['tags']
             self.exists = True
         else:
             self.name = ''
@@ -32,14 +32,17 @@ class Recipe:
             self.tags = []
             self.exists = False
 
-    def __str__(self):
-        return json.dumps({
+    def toDict(self):
+        return {
             'slug': self.slug,
             'name': self.name,
             'description': self.description,
             'image_id': self.image_id,
             'tags': self.tags
-        })
+        }
+
+    def toJson(self):
+        return json.dumps(self.toDict())
 
     def save(self):
         if self.exists:
@@ -75,11 +78,11 @@ class Recipe:
 
 
 class RecipeCollection:
-    def __new__(self, tags=[]):
+    def __init__(self, tags=[]):
         self.table = dynamodb.Table(os.environ['RECIPE_TABLE_NAME'])
         condition = None
         queryResult = None
-        if tags and len(self.tags) > 0:
+        if len(tags) > 0:
             self.tags = tags
             for tag in tags:
                 if condition is None:
@@ -89,15 +92,15 @@ class RecipeCollection:
             queryResult = self.table.scan(FilterExpression=condition)
         else:
             queryResult = self.table.scan()
-        self.recipes = [Recipe(item) for item in queryResult['Items']]
-        if not self.tags:
-            self.tags = set()
-            for recipe in self.recipes:
-                for tag in recipe.tags:
-                    self.tags.add(tag)
+        self.recipes = [Recipe(item['slug'], item) for item in queryResult['Items']]
+        # collect the tags from all collected recipes
+        self.tags = set()
+        for recipe in self.recipes:
+            for tag in recipe.tags:
+                self.tags.add(tag)
 
-    def __str__(self):
+    def toJson(self):
         return json.dumps({
-            'recipes': self.recipes,
-            'tags': self.tags
+            'recipes': [r.toDict() for r in self.recipes],
+            'tags': sorted(list(self.tags))
         })

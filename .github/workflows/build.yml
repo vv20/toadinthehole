@@ -45,6 +45,10 @@ jobs:
           cd frontend
           npm ci
 
+      - name: Run Tests
+        run: |
+          pytest -v
+
       - name: Build CDN Stack
         uses: youyo/aws-cdk-github-actions@v2
         with:
