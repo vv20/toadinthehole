@@ -46,6 +46,9 @@ class InMemoryDatabaseTable:
         for attribute_name in kwargs['ExpressionAttributeValues']:
             self.rows[i][attribute_name.replace(':', '')] = kwargs['ExpressionAttributeValues'][attribute_name]
 
+    def put_item(self, *args, **kwargs):
+        self.rows.append(kwargs['Item'])
+
     def _evaluate_filter(self, row, filter_expression):
         return {
                 'OR': self._evaluate_or_filter,
@@ -74,6 +77,7 @@ def data_setup(mocker):
     mock_recipe_table.scan.side_effect = RECIPES_TABLE.scan
     mock_recipe_table.get_item.side_effect = RECIPES_TABLE.get_item
     mock_recipe_table.update_item.side_effect = RECIPES_TABLE.update_item
+    mock_recipe_table.put_item.side_effect = RECIPES_TABLE.put_item
 
 
 @pytest.mark.parametrize(
@@ -83,7 +87,8 @@ def data_setup(mocker):
             ('GET','/collection', 'tag1-search.json', None, 200, 'tag1-recipes.json', 'setup-data.json'), # get all recipes with tag1
             ('GET','/collection', 'tag1-and-tag2-search.json', None, 200, 'tag1-and-tag2-recipes.json', 'setup-data.json'), # get all recipes with tags 1 and 2
             ('GET', '/recipe', 'recipe1-search.json', None, 200, 'recipe1.json', 'setup-data.json'), # get recipe1
-            ('POST', '/recipe', 'recipe1-search.json', 'recipe1-edited.json', 201, None, 'data-with-edited-recipe.json') # edit recipe1
+            ('POST', '/recipe', 'recipe1-search.json', 'recipe1-edited.json', 201, None, 'data-with-edited-recipe.json'), # edit recipe1
+            ('POST', '/recipe', None, 'recipe5.json', 201, None, 'data-with-new-recipe.json') # create new recipe
         ]
     )
 def test_handlers(
@@ -125,4 +130,4 @@ def test_handlers(
     if expected_data_after_file_name is not None:
         with open('backend/test-assets/' + expected_data_after_file_name, 'r') as expected_data_after_file:
             expected_data_after = json.load(expected_data_after_file)
-            assert RECIPES_TABLE.scan()['Items'] == expected_data_after
+            assert RECIPES_TABLE.rows == expected_data_after

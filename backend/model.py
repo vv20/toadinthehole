@@ -3,35 +3,37 @@ import os
 
 import boto3
 from boto3.dynamodb.conditions import Attr, Or
+from slugify import slugify
 
 dynamodb = boto3.resource('dynamodb')
 
 class Recipe:
-    def __init__(self, slug, item=None):
+    def __init__(self, slug=None, item=None):
         self.table = dynamodb.Table(os.environ['RECIPE_TABLE_NAME'])
-        self.item = item
-        if item is None:
-            queryResponse = self.table.get_item(
-                Key = {
-                    'slug': slug
-                }
-            )
-            if 'Item' in queryResponse:
-                self.item = queryResponse['Item']
-        if self.item:
-            self.slug = self.item['slug']
-            self.name = self.item['name']
-            self.description = self.item['description']
-            self.image_id = self.item['image_id']
-            self.tags = self.item['tags']
+        self.slug = slug
+        self.exists = False
+        if slug is None and item is not None and 'name' in item:
+            self.slug = slugify(item['name'])
+
+        # try to fetch the recipe from the database
+        queryResponse = self.table.get_item(
+            Key = {
+                'slug': slug
+            }
+        )
+        if 'Item' in queryResponse:
             self.exists = True
-        else:
-            self.slug = slug
-            self.name = ''
-            self.description = ''
-            self.image_id = ''
-            self.tags = []
-            self.exists = False
+            self.name = queryResponse['Item']['name']
+            self.description = queryResponse['Item']['description']
+            self.image_id = queryResponse['Item']['image_id']
+            self.tags = queryResponse['Item']['tags']
+
+        # override remote attributes with local ones
+        if item is not None:
+            self.name = item['name']
+            self.description = item['description']
+            self.image_id = item['image_id']
+            self.tags = item['tags']
 
     def toDict(self):
         return {
