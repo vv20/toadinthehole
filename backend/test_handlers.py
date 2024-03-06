@@ -25,9 +25,7 @@ class InMemoryDatabaseTable:
         }
 
     def get_item(self, *args, **kwargs):
-        possible_results = self.rows
-        for key in kwargs['Key']:
-            possible_results = [row for row in possible_results if row[key] == kwargs['Key'][key]]
+        possible_results = [row for row in self.rows if self._row_matches_key(row, kwargs['Key'])]
         if len(possible_results) > 0:
             return {
                 'Item': possible_results[0]
@@ -37,8 +35,7 @@ class InMemoryDatabaseTable:
     def update_item(self, *args, **kwargs):
         item_index = -1
         for i in range(len(self.rows)):
-            item_matches = all([True for key in kwargs['Key'] if self.rows[i] == kwargs['Key'][key]])
-            if item_matches:
+            if self._row_matches_key(self.rows[i], kwargs['Key']):
                 item_index = i
                 break
         if item_index == -1:
@@ -46,8 +43,14 @@ class InMemoryDatabaseTable:
         for attribute_name in kwargs['ExpressionAttributeValues']:
             self.rows[i][attribute_name.replace(':', '')] = kwargs['ExpressionAttributeValues'][attribute_name]
 
+    def delete_items(self, *args, **kwargs):
+        self.rows = [row for row in self.rows if not self._row_matches_key(row, kwargs['Key'])]
+
     def put_item(self, *args, **kwargs):
         self.rows.append(kwargs['Item'])
+
+    def _row_matches_key(self, row, keyset):
+        return any([True for key in keyset if row[key] == keyset[key]])
 
     def _evaluate_filter(self, row, filter_expression):
         return {
@@ -78,17 +81,38 @@ def data_setup(mocker):
     mock_recipe_table.get_item.side_effect = RECIPES_TABLE.get_item
     mock_recipe_table.update_item.side_effect = RECIPES_TABLE.update_item
     mock_recipe_table.put_item.side_effect = RECIPES_TABLE.put_item
+    mock_recipe_table.delete_items.side_effect = RECIPES_TABLE.delete_items
 
 
 @pytest.mark.parametrize(
         'http_method,resource,query_parameters_file_name,request_body_file_name,response_code,expected_response_body_file_name,expected_data_after_file_name',
         [
-            ('GET', '/collection', None, None, 200, 'all-recipes.json', 'setup-data.json'), # get all recipes
-            ('GET','/collection', 'tag1-search.json', None, 200, 'tag1-recipes.json', 'setup-data.json'), # get all recipes with tag1
-            ('GET','/collection', 'tag1-and-tag2-search.json', None, 200, 'tag1-and-tag2-recipes.json', 'setup-data.json'), # get all recipes with tags 1 and 2
-            ('GET', '/recipe', 'recipe1-search.json', None, 200, 'recipe1.json', 'setup-data.json'), # get recipe1
-            ('POST', '/recipe', 'recipe1-search.json', 'recipe1-edited.json', 201, None, 'data-with-edited-recipe.json'), # edit recipe1
-            ('POST', '/recipe', None, 'recipe5.json', 201, None, 'data-with-new-recipe.json') # create new recipe
+
+            # get all recipes
+            ('GET', '/collection', None, None, 200, 'all-recipes.json', 'setup-data.json'),
+            # get all recipes with tag1
+            ('GET', '/collection', 'tag1-search.json', None, 200, 'tag1-recipes.json', 'setup-data.json'),
+            # get all recipes with tags 1 and 2
+            ('GET', '/collection', 'tag1-and-tag2-search.json', None, 200, 'tag1-and-tag2-recipes.json', 'setup-data.json'),
+            # search by a tag that doesn't exist
+            ('GET', '/collection', 'non-existent-tag-search.json', None, 200, 'empty-data.json', 'setup-data.json'),
+            # get recipe1
+            ('GET', '/recipe', 'recipe1-search.json', None, 200, 'recipe1.json', 'setup-data.json'),
+            # get a non-existent recipe
+            ('GET', '/recipe', 'non-existent-recipe-search.json', None, 404, None, 'setup-data.json'),
+            # edit a recipe
+            ('POST', '/recipe', 'recipe1-search.json', 'recipe1-edited.json', 201, None, 'data-with-edited-recipe.json'),
+            # edit a non-existent recipe
+            ('GET', '/recipe', 'non-existent-recipe-search.json', 'recipe1-edited.json', 404, None, 'setup-data.json'),
+            # create a new recipe
+            ('POST', '/recipe', None, 'recipe5.json', 201, None, 'data-with-new-recipe.json'),
+            # create a new recipe without a body
+            ('POST', '/recipe', None, None, 400, None, 'setup-data.json'),
+            # delete an existing recipe
+            ('DELETE', '/recipe', 'recipe1-search.json', None, 201, None, 'data-with-deleted-recipe.json'),
+            # delete a non-existent recipe
+            ('DELETE', '/recipe', 'non-existent-recipe-search.json', None, 404, None, 'setup-data.json')
+
         ]
     )
 def test_handlers(

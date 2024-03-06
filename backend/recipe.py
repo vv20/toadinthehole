@@ -14,6 +14,8 @@ def save_recipe(event):
     if 'queryStringParameters' in event and 'recipeID' in event['queryStringParameters']:
         recipe = Recipe(slug=event['queryStringParameters']['recipeID'], item=event['body'])
     else:
+        if 'body' not in event:
+            return build_response_body(400, 'Missing request body')
         recipe = Recipe(item=event['body'])
     recipe.save()
     return build_response_body(201, 'OK')
