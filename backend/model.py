@@ -9,7 +9,6 @@ dynamodb = boto3.resource('dynamodb')
 class Recipe:
     def __init__(self, slug, item=None):
         self.table = dynamodb.Table(os.environ['RECIPE_TABLE_NAME'])
-        self.slug = slug
         self.item = item
         if item is None:
             queryResponse = self.table.get_item(
@@ -20,12 +19,14 @@ class Recipe:
             if 'Item' in queryResponse:
                 self.item = queryResponse['Item']
         if self.item:
+            self.slug = self.item['slug']
             self.name = self.item['name']
             self.description = self.item['description']
             self.image_id = self.item['image_id']
             self.tags = self.item['tags']
             self.exists = True
         else:
+            self.slug = slug
             self.name = ''
             self.description = ''
             self.image_id = ''

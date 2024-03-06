@@ -13,7 +13,7 @@ def create_handler(method_dict):
         if event['httpMethod'] not in method_dict:
             return build_response_body(400, 'HTTP method not supported')
         try:
-            return build_response_body(200, method_dict[event['httpMethod']](event).toJson())
+            return method_dict[event['httpMethod']](event)
         except:
             print(traceback.format_exc())
             return build_response_body(500, 'Internal server error')

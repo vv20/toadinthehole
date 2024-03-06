@@ -1,4 +1,4 @@
-from common import create_handler
+from common import build_response_body, create_handler
 from model import RecipeCollection
 
 
@@ -7,7 +7,7 @@ def get_recipe_collection(event):
         collection = RecipeCollection(event['queryStringParameters']['tags'])
     else:
         collection = RecipeCollection()
-    return collection
+    return build_response_body(200, collection.toJson())
 
 handler = create_handler({
     'GET': get_recipe_collection,
