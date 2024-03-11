@@ -2,6 +2,7 @@ import json
 import os
 
 import pytest
+from image import handler as image_handler
 from recipe import handler as recipe_handler
 from recipe_collection import handler as recipe_collection_handler
 from test_util import InMemoryDatabaseTable
@@ -13,16 +14,10 @@ RECIPES_TABLE = InMemoryDatabaseTable()
 def data_setup(mocker):
     os.environ['RECIPE_TABLE_NAME'] = 'recipe_table_name'
 
-    RECIPES_TABLE.setup('backend/test-assets/setup-data.json')
-
     mock_dynamodb = mocker.patch('model.dynamodb')
     mock_recipe_table = mock_dynamodb.Table.return_value
-
-    mock_recipe_table.scan.side_effect = RECIPES_TABLE.scan
-    mock_recipe_table.get_item.side_effect = RECIPES_TABLE.get_item
-    mock_recipe_table.update_item.side_effect = RECIPES_TABLE.update_item
-    mock_recipe_table.put_item.side_effect = RECIPES_TABLE.put_item
-    mock_recipe_table.delete_items.side_effect = RECIPES_TABLE.delete_items
+    RECIPES_TABLE.bind_to_mock(mock_recipe_table)
+    RECIPES_TABLE.setup('backend/test-assets/setup-data.json')
 
 
 @pytest.mark.parametrize(
@@ -96,3 +91,15 @@ def test_handlers(
         with open('backend/test-assets/' + expected_data_after_file_name, 'r') as expected_data_after_file:
             expected_data_after = json.load(expected_data_after_file)
             assert RECIPES_TABLE.rows == expected_data_after
+
+
+def test_image_handler(mocker):
+    os.environ['IMAGE_BUCKET_ARN'] = 'image_bucket_arn'
+    presigned_url = 'https://presigned.url'
+    mock_s3 = mocker.patch('image.s3')
+    mock_s3.generate_presigned_url.return_value = presigned_url
+
+    response = image_handler({'httpMethod': 'GET'}, {})
+
+    assert response['statusCode'] == 200
+    assert response['body'] == presigned_url

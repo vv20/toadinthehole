@@ -38,7 +38,8 @@ class ToadInTheHoleMainStack(Stack):
                 environment,
                 api_role,
                 lambda_role,
-                recipe_table)
+                recipe_table,
+                image_bucket)
         zone = self.lookup_zone(domain_name)
         api_certificate = self.create_certificate(environment, domain_name, zone)
         frontend_certificate = self.lookup_frontend_certificate(environment, frontend_certificate_arn)
@@ -76,7 +77,13 @@ class ToadInTheHoleMainStack(Stack):
 
         image_bucket = s3.Bucket(
                 self,
-                Component.IMAGE_BUCKET.get_component_name(environment))
+                Component.IMAGE_BUCKET.get_component_name(environment),
+                public_read_access=True,
+                block_public_access=s3.BlockPublicAccess(
+                    block_public_acls=False,
+                    block_public_policy=False,
+                    ignore_public_acls=False,
+                    restrict_public_buckets=False))
         return frontend_bucket, image_bucket
 
     def create_dynamodb_table(self, environment):
@@ -108,7 +115,11 @@ class ToadInTheHoleMainStack(Stack):
                 Component.IMAGE_BUCKET_WRITE_ONLY_POLICY.get_component_name(environment),
                 statements=[
                     iam.PolicyStatement(
-                        actions=['s3-bucket:PutObject'],
+                        actions=[
+                            's3-bucket:PutObject',
+                            's3-bucket:GetObject',
+                            's3-bucket:PutObjectAcl'
+                        ],
                         resources=[image_bucket.bucket_arn]
                     )])
         image_bucket_write_only_policy.attach_to_role(lambda_role)
@@ -177,13 +188,15 @@ class ToadInTheHoleMainStack(Stack):
             environment,
             api_role,
             lambda_role,
-            recipe_table):
+            recipe_table,
+            image_bucket):
         lambda_kwargs = {
                 'code'       : lambda_.Code.from_asset('backend'),
                 'role'       : lambda_role,
                 'runtime'    : lambda_.Runtime.PYTHON_3_9,
                 'environment': {
-                    'RECIPE_TABLE_NAME': recipe_table.table_name
+                    'RECIPE_TABLE_NAME': recipe_table.table_name,
+                    'IMAGE_BUCKET_ARN': image_bucket.bucket_arn
                 }
         }
 
@@ -287,16 +300,6 @@ class ToadInTheHoleMainStack(Stack):
 
         image_resource.add_method(
                 'GET',
-                authorizer=authorizer,
-                integration=apigateway.AwsIntegration(
-                    service='s3',
-                    path=image_bucket.bucket_website_url + '/{imageId}',
-                    integration_http_method='GET',
-                    options=apigateway.IntegrationOptions(
-                        credentials_role=api_role)))
-
-        image_resource.add_method(
-                'PUT',
                 authorizer=authorizer,
                 integration=apigateway.LambdaIntegration(
                     image_handler,
