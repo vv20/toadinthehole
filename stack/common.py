@@ -22,6 +22,7 @@ class Component(Enum):
     IMAGE_BUCKET_READ_ONLY_POLICY  = 'image_bucket_read_only_policy'
     IMAGE_BUCKET_WRITE_ONLY_POLICY = 'image_bucket_write_only_policy'
     IMAGE_HANDLER                  = 'image_handler'
+    LAMBDA_DEPENDENCY_LAYER        = 'lambda_dependency_layer'
     LAMBDA_ROLE                    = 'lambda_role'
     LAMBDA_EXECUTION_POLICY        = 'lambda_execution_policy'
     ORIGIN_ACCESS_IDENTITY         = 'origin_access_identity'

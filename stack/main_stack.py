@@ -7,6 +7,7 @@ from aws_cdk import aws_cognito as cognito
 from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as lambda_
+from aws_cdk import aws_lambda_python_alpha as lambda_python
 from aws_cdk import aws_route53 as route53
 from aws_cdk import aws_route53_targets as route53_targets
 from aws_cdk import aws_s3 as s3
@@ -191,7 +192,8 @@ class ToadInTheHoleMainStack(Stack):
             recipe_table,
             image_bucket):
         lambda_kwargs = {
-                'code'       : lambda_.Code.from_asset('backend'),
+                'entry'      : 'backend',
+                'handler'    : 'handler',
                 'role'       : lambda_role,
                 'runtime'    : lambda_.Runtime.PYTHON_3_9,
                 'environment': {
@@ -200,22 +202,22 @@ class ToadInTheHoleMainStack(Stack):
                 }
         }
 
-        recipe_handler = lambda_.Function(
+        recipe_handler = lambda_python.PythonFunction(
                 self,
                 Component.RECIPE_HANDLER.get_component_name(environment),
-                handler='recipe.handler',
+                index='recipe.py',
                 **lambda_kwargs)
 
-        collection_handler = lambda_.Function(
+        collection_handler = lambda_python.PythonFunction(
                 self,
                 Component.COLLECTION_HANDLER.get_component_name(environment),
-                handler='recipe_collection.handler',
+                index='recipe_collection.py',
                 **lambda_kwargs)
 
-        image_handler = lambda_.Function(
+        image_handler = lambda_python.PythonFunction(
                 self,
                 Component.IMAGE_HANDLER.get_component_name(environment),
-                handler='image.handler',
+                index='image.py',
                 **lambda_kwargs)
 
         lambda_invocation_policy = iam.Policy(
