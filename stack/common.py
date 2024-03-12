@@ -14,8 +14,8 @@ class LocalBundler:
 
     def try_bundle(self, output_dir, bundling_opts):
         try:
-            check_call('pip install -r backend/requirements.txt -t backend/python/lib/python3.9/site-packages/', shell=True)
-            check_call('cp -r backend/* {}'.format(output_dir), shell=True)
+            check_call('pip install -r backend/requirements.txt -t {}'.format(output_dir), shell=True)
+            check_call('cp -a backend/* {}'.format(output_dir), shell=True)
             return True
         except CalledProcessError as e:
             print('Command {} returned non-zero exit status {}.'.format(e.cmd, e.returncode))
