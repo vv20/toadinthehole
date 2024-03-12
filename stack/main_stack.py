@@ -1,4 +1,4 @@
-from aws_cdk import CfnOutput, Duration, Fn, Stack
+from aws_cdk import BundlingOptions, CfnOutput, Duration, Fn, Stack
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_certificatemanager as acm
 from aws_cdk import aws_cloudfront as cloudfront
@@ -7,13 +7,13 @@ from aws_cdk import aws_cognito as cognito
 from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as lambda_
-from aws_cdk import aws_lambda_python_alpha as lambda_python
 from aws_cdk import aws_route53 as route53
 from aws_cdk import aws_route53_targets as route53_targets
 from aws_cdk import aws_s3 as s3
 from constructs import Construct
 
-from stack.common import Component, Domain, get_environment_domain
+from stack.common import (Component, Domain, LocalBundler,
+                          get_environment_domain)
 
 
 class ToadInTheHoleMainStack(Stack):
@@ -192,8 +192,12 @@ class ToadInTheHoleMainStack(Stack):
             recipe_table,
             image_bucket):
         lambda_kwargs = {
-                'entry'      : 'backend',
-                'handler'    : 'handler',
+                'code'       : lambda_.Code.from_asset(
+                    'backend',
+                    bundling=BundlingOptions(
+                        image=lambda_.Runtime.PYTHON_3_9.bundling_image,
+                        command=[],
+                        local=LocalBundler())),
                 'role'       : lambda_role,
                 'runtime'    : lambda_.Runtime.PYTHON_3_9,
                 'environment': {
@@ -202,22 +206,22 @@ class ToadInTheHoleMainStack(Stack):
                 }
         }
 
-        recipe_handler = lambda_python.PythonFunction(
+        recipe_handler = lambda_.Function(
                 self,
                 Component.RECIPE_HANDLER.get_component_name(environment),
-                index='recipe.py',
+                handler='recipe.handler',
                 **lambda_kwargs)
 
-        collection_handler = lambda_python.PythonFunction(
+        collection_handler = lambda_.Function(
                 self,
                 Component.COLLECTION_HANDLER.get_component_name(environment),
-                index='recipe_collection.py',
+                handler='recipe_collection.handler',
                 **lambda_kwargs)
 
-        image_handler = lambda_python.PythonFunction(
+        image_handler = lambda_.Function(
                 self,
                 Component.IMAGE_HANDLER.get_component_name(environment),
-                index='image.py',
+                handler='image.handler',
                 **lambda_kwargs)
 
         lambda_invocation_policy = iam.Policy(

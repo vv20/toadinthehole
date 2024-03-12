@@ -1,9 +1,26 @@
 from enum import Enum
+from subprocess import CalledProcessError, check_call
+
+from aws_cdk import ILocalBundling
+from jsii import implements
 
 APPLICATION_NAME = 'ToadInTheHole'
 COMPONENT_DOMAIN_NAME_FORMAT = '{component}.{environment}.{top_level_domain}'
 COMPONENT_NAME_FORMAT = '{application_name}{component_name}{environment}'
 ENVIRONMENT_DOMAIN_NAME_FORMAT = '{environment}.{top_level_domain}'
+
+@implements(ILocalBundling)
+class LocalBundler:
+
+    def try_bundle(self, output_dir, bundling_opts):
+        try:
+            check_call('pip install -r backend/requirements.txt -t backend/python/lib/python3.9/site-packages/', shell=True)
+            check_call('cp -r backend/* {}'.format(output_dir), shell=True)
+            return True
+        except CalledProcessError as e:
+            print('Command {} returned non-zero exit status {}.'.format(e.cmd, e.returncode))
+            return False
+
 
 class Component(Enum):
     API                            = 'api'
@@ -22,7 +39,6 @@ class Component(Enum):
     IMAGE_BUCKET_READ_ONLY_POLICY  = 'image_bucket_read_only_policy'
     IMAGE_BUCKET_WRITE_ONLY_POLICY = 'image_bucket_write_only_policy'
     IMAGE_HANDLER                  = 'image_handler'
-    LAMBDA_DEPENDENCY_LAYER        = 'lambda_dependency_layer'
     LAMBDA_ROLE                    = 'lambda_role'
     LAMBDA_EXECUTION_POLICY        = 'lambda_execution_policy'
     ORIGIN_ACCESS_IDENTITY         = 'origin_access_identity'
