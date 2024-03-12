@@ -3,7 +3,7 @@ from model import Recipe
 
 
 def get_recipe(event):
-    if not 'queryStringParameters' in event or not 'recipeID' in event['queryStringParameters']:
+    if not 'queryStringParameters' in event or event['queryStringParameters'] is None or not 'recipeID' in event['queryStringParameters']:
         return build_response_body(400, 'Missing recipe ID')
     recipe = Recipe(slug=event['queryStringParameters']['recipeID'])
     if not recipe.exists:
@@ -11,7 +11,7 @@ def get_recipe(event):
     return build_response_body(200, recipe.toJson())
 
 def save_recipe(event):
-    if 'queryStringParameters' in event and 'recipeID' in event['queryStringParameters']:
+    if 'queryStringParameters' in event and event['queryStringParameters'] is not None and 'recipeID' in event['queryStringParameters']:
         recipe = Recipe(slug=event['queryStringParameters']['recipeID'], item=event['body'])
     else:
         if 'body' not in event:

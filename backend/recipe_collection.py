@@ -3,7 +3,7 @@ from model import RecipeCollection
 
 
 def get_recipe_collection(event):
-    if 'queryStringParameters' in event and 'tags' in event['queryStringParameters']:
+    if 'queryStringParameters' in event and event['queryStringParameters'] is not None and 'tags' in event['queryStringParameters']:
         collection = RecipeCollection(event['queryStringParameters']['tags'])
     else:
         collection = RecipeCollection()

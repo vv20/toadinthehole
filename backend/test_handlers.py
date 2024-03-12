@@ -67,6 +67,8 @@ def test_handlers(
     if query_parameters_file_name is not None:
         with open('backend/test-assets/' + query_parameters_file_name, 'r') as query_parameters_file:
             event['queryStringParameters'] = json.load(query_parameters_file)
+    else:
+        event['queryStringParameters'] = None
 
     if request_body_file_name is not None:
         with open('backend/test-assets/' + request_body_file_name, 'r') as request_body_file:
