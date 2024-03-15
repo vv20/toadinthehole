@@ -26,7 +26,7 @@ function RecipeList() {
         const { body } = await restOperation.response;
         const responseJson: any[] = Array.of(await body.json());
 
-        if (responseJson.length == 0) {
+        if (responseJson.length === 0) {
           return;
         }
 
