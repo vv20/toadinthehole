@@ -1,0 +1,7 @@
+{
+	"statusCode": 200,
+	"headers": {
+		"Access-Control-Allow-Origin": "http://localhost:3000"
+	},
+	"body": "https://presigned.url"
+}

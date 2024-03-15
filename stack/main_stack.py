@@ -256,7 +256,7 @@ class ToadInTheHoleMainStack(Stack):
                 Component.USER_POOL_AUTHORIZER.get_component_name(environment),
                 cognito_user_pools=[user_pool])
 
-        cors_origins = ['https://' + Domain.FRONTEND.get_domain_name(environment, domain_name) + ':8080']
+        cors_origins = ['https://' + Domain.FRONTEND.get_domain_name(environment, domain_name)]
         if (localhost_access):
             cors_origins.append('https://localhost:3000')
 

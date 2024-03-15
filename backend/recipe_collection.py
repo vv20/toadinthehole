@@ -7,7 +7,7 @@ def get_recipe_collection(event):
         collection = RecipeCollection(event['queryStringParameters']['tags'])
     else:
         collection = RecipeCollection()
-    return build_response_body(200, collection.toJson())
+    return build_response_body(200, collection.toJson(), event)
 
 handler = create_handler({
     'GET': get_recipe_collection,

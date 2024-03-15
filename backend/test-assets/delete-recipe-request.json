@@ -1,0 +1,9 @@
+{
+	"httpMethod": "DELETE",
+	"headers": {
+		"Origin": "http://localhost:3000"
+	},
+	"queryStringParameters": {
+		"recipeID": "recipe1"
+	}
+}

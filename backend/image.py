@@ -16,7 +16,7 @@ def get_presigned_url(event):
                 'ContentType': 'image/jpeg',
                 'ACL': 'public-read'
             })
-    return build_response_body(200, presigned_url)
+    return build_response_body(200, presigned_url, event)
 
 handler = create_handler({
         'GET': get_presigned_url,

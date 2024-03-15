@@ -1,0 +1,7 @@
+{
+	"httpMethod": "POST",
+	"headers": {
+		"Origin": "http://localhost:3000"
+	},
+	"body": "{\"name\": \"Recipe 5\", \"description\": \"The fifth recipe ever\", \"image_id\": \"image_id5\", \"tags\": [\"tag1\",\"tag2\"]}"
+}

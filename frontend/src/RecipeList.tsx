@@ -26,6 +26,10 @@ function RecipeList() {
         const { body } = await restOperation.response;
         const responseJson: any[] = Array.of(await body.json());
 
+        if (responseJson.length == 0) {
+          return;
+        }
+
         const recipePreviews: ReactNode[] = [];
         for (var i = 0; i < responseJson.length; i++) {
           recipePreviews.push(<RecipePreview preview={responseJson[i]} />);
