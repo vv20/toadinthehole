@@ -279,6 +279,8 @@ class ToadInTheHoleMainStack(Stack):
                     allow_origins=cors_origins,
                     allow_credentials=True),
                 deploy_options=apigateway.StageOptions(
+                    data_trace_enabled=True,
+                    logging_level=apigateway.MethodLoggingLevel.INFO,
                     access_log_destination=apigateway.LogGroupLogDestination(log_group)),
                 deploy=True)
 
