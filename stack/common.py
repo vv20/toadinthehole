@@ -41,6 +41,7 @@ class Component(Enum):
     IMAGE_HANDLER                  = 'image_handler'
     LAMBDA_ROLE                    = 'lambda_role'
     LAMBDA_EXECUTION_POLICY        = 'lambda_execution_policy'
+    LOG_GROUP                      = 'log_group'
     ORIGIN_ACCESS_IDENTITY         = 'origin_access_identity'
     RECIPE_HANDLER                 = 'recipe_handler'
     RECIPE_TABLE                   = 'recipe_table'

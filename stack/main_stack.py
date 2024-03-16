@@ -7,6 +7,7 @@ from aws_cdk import aws_cognito as cognito
 from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as lambda_
+from aws_cdk import aws_logs as logs
 from aws_cdk import aws_route53 as route53
 from aws_cdk import aws_route53_targets as route53_targets
 from aws_cdk import aws_s3 as s3
@@ -260,16 +261,25 @@ class ToadInTheHoleMainStack(Stack):
         if (localhost_access):
             cors_origins.append('https://localhost:3000')
 
+        log_group = logs.LogGroup(
+                self,
+                Component.LOG_GROUP.get_component_name(environment),
+                log_group_name=Component.LOG_GROUP.get_component_name(environment),
+                retention=logs.RetentionDays.ONE_MONTH)
+
         api = apigateway.RestApi(
                 self,
                 Component.API.get_component_name(environment),
                 rest_api_name=Component.API.get_component_name(environment),
+                cloud_watch_role=True,
                 domain_name=apigateway.DomainNameOptions(
                     certificate=certificate,
                     domain_name=Domain.API.get_domain_name(environment, domain_name)),
                 default_cors_preflight_options=apigateway.CorsOptions(
                     allow_origins=cors_origins,
                     allow_credentials=True),
+                deploy_options=apigateway.StageOptions(
+                    access_log_destination=apigateway.LogGroupLogDestination(log_group)),
                 deploy=True)
 
         recipe_resource     = api.root.add_resource('recipe')
@@ -279,6 +289,7 @@ class ToadInTheHoleMainStack(Stack):
         recipe_resource.add_method(
                 'GET',
                 authorizer=authorizer,
+
                 integration=apigateway.LambdaIntegration(
                     recipe_handler,
                     credentials_role=api_role))
