@@ -42,7 +42,7 @@ function RecipeList({ themeType }: { themeType: ThemeType }) {
       }
     };
     fetchRecipes();
-  }, []);
+  }, [themeType]);
 
   return (
     <div className={"RecipeList RecipeList-" + themeType}>
