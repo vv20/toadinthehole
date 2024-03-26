@@ -23,15 +23,18 @@ function Header({
 
   return (
     <div className={"Header Header-" + themeType}>
-      <label className={"InputLabel InputLabel-" + themeType}>Theme:</label>
-      <Select
-        className={"ThemeSelector ThemeSelector-" + themeType}
-        defaultValue="Pastel"
-        options={options}
-        onChange={(newValue) =>
-          setThemeType(ThemeType[newValue as keyof typeof ThemeType])
-        }
-      />
+      <div className={"HeaderLeft HeaderLeft-" + themeType}></div>
+      <div className={"HeaderRight HeaderRight-" + themeType}>
+        <label className={"InputLabel InputLabel-" + themeType}>Theme:</label>
+        <Select
+          className={"ThemeSelector ThemeSelector-" + themeType}
+          defaultValue="Pastel"
+          options={options}
+          onChange={(newValue) =>
+            setThemeType(ThemeType[newValue as keyof typeof ThemeType])
+          }
+        />
+      </div>
     </div>
   );
 }

@@ -1,0 +1,13 @@
+.RecipeList {
+	margin: auto;
+	width: 75%;
+}
+
+.RecipeList-Notebook {
+}
+
+.RecipeList-Pastel {
+	margin-top: 50px;
+	border-style: solid;
+	background-color: white;
+}

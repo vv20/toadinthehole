@@ -3,6 +3,7 @@
 	border-top: none;
 	border-bottom: none;
 	background-color: white;
+	width: fit-content;
 }
 
 .ThemeSelector-Notebook {

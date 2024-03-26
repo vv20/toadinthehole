@@ -1,6 +1,5 @@
 .Header {
-	display: flex;
-	justify-content: right;
+	display: grid;
 }
 
 .Header-Notebook {
