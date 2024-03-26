@@ -1,18 +1,20 @@
 import { Amplify } from "aws-amplify";
 import { getCurrentUser } from "aws-amplify/auth";
-import { useEffect, useState } from "react";
-
-import "./App.css";
+import { ReactNode, useEffect, useState } from "react";
+import Header from "./Header";
+import RecipeList from "./RecipeList";
 
 import LoginPage from "./LoginPage";
-import Main from "./Main";
 
 import amplifyconfiguration from "./amplifyconfiguration.json";
+import "./App.css";
+import { ThemeType } from "./ThemeType";
 
 Amplify.configure(amplifyconfiguration);
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [themeType, setThemeType] = useState<ThemeType>(ThemeType.Pastel);
 
   useEffect(() => {
     const checkLogIn = async () => {
@@ -27,20 +29,19 @@ function App() {
     checkLogIn();
   }, []);
 
+  var child: ReactNode;
   if (!isLoggedIn) {
-    return (
-      <div className="App">
-        <h1>Log In:</h1>
-        <LoginPage setIsLoggedIn={setIsLoggedIn} />
-      </div>
-    );
+    child = <LoginPage setIsLoggedIn={setIsLoggedIn} themeType={themeType} />;
   } else {
-    return (
-      <div className="App">
-        <Main />
-      </div>
-    );
+    child = <RecipeList themeType={themeType} />;
   }
+
+  return (
+    <div className={"App App-" + themeType}>
+      <Header themeType={themeType} setThemeType={setThemeType} />
+      {child}
+    </div>
+  );
 }
 
 export default App;

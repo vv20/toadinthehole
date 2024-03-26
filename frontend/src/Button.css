@@ -1,0 +1,13 @@
+.Button-Notebook {
+	font-family: "Babylonica";
+	font-size: 25px;
+}
+
+.Button-Pastel {
+	font-family: "Bona Nova";
+	border-color: #5f86d2;
+	background-color: white;
+	color: #5f86d2;
+	padding: 10px;
+	font-size: 15px;
+}

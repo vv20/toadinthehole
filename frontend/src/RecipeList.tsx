@@ -2,11 +2,11 @@ import { get } from "aws-amplify/api";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { ReactNode, useEffect, useState } from "react";
 
-import RecipePreview from "./RecipePreview";
-
 import "./RecipeList.css";
+import RecipePreview from "./RecipePreview";
+import { ThemeType } from "./ThemeType";
 
-function RecipeList() {
+function RecipeList({ themeType }: { themeType: ThemeType }) {
   const [recipes, setRecipes] = useState<Array<ReactNode>>([]);
 
   useEffect(() => {
@@ -32,7 +32,9 @@ function RecipeList() {
 
         const recipePreviews: ReactNode[] = [];
         for (var i = 0; i < responseJson.length; i++) {
-          recipePreviews.push(<RecipePreview preview={responseJson[i]} />);
+          recipePreviews.push(
+            <RecipePreview themeType={themeType} preview={responseJson[i]} />
+          );
         }
         setRecipes(recipePreviews);
       } catch (e) {
@@ -43,8 +45,8 @@ function RecipeList() {
   }, []);
 
   return (
-    <div className="RecipeList">
-      <h1>Recipes:</h1>
+    <div className={"RecipeList RecipeList-" + themeType}>
+      <h1 className={"PageTitle PageTitle-" + themeType}>Recipes:</h1>
       {recipes}
     </div>
   );

@@ -1,0 +1,16 @@
+.LoginFormRow {
+	margin: auto;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	width: fit-content;
+}
+
+.LoginFormRow-Notebook {
+	border-bottom-style: dotted;
+	border-bottom-color: #4a2a0a;
+	border-bottom-width: 1px;
+}
+
+.LoginFormRow-Pastel {
+	margin-right: 29%;
+}

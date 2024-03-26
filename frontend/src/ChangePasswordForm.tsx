@@ -1,13 +1,17 @@
 import { confirmResetPassword } from "aws-amplify/auth";
 import { ChangeEvent, Dispatch, FormEvent, useState } from "react";
-
-import "./ChangePasswordForm.css";
+import "./Button.css";
+import "./InputField.css";
+import "./InputLabel.css";
+import { ThemeType } from "./ThemeType";
 
 function ChangePasswordForm({
+  themeType,
   username,
   setLogInError,
   setRequirePasswordChange,
 }: {
+  themeType: ThemeType;
   username: string;
   setLogInError: Dispatch<string>;
   setRequirePasswordChange: Dispatch<boolean>;
@@ -39,8 +43,9 @@ function ChangePasswordForm({
 
   return (
     <form onSubmit={handlePasswordChange}>
-      <label>Password:</label>
+      <label className={"InputLabel InputLabel-" + themeType}>Password:</label>
       <input
+        className={"InputField InputField-" + themeType}
         type="text"
         id="password"
         name="password"
@@ -48,11 +53,21 @@ function ChangePasswordForm({
       />
       <br />
 
-      <label>Confirmation code:</label>
-      <input type="text" id="code" name="code" onChange={handleChange} />
+      <label className={"InputLabel InputLabel-" + themeType}>
+        Confirmation code:
+      </label>
+      <input
+        className={"InputField InputField-" + themeType}
+        type="text"
+        id="code"
+        name="code"
+        onChange={handleChange}
+      />
       <br />
 
-      <button type="submit">Log In</button>
+      <button className={"Button Button-" + themeType} type="submit">
+        Log In
+      </button>
     </form>
   );
 }

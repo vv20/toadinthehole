@@ -1,11 +1,16 @@
 import { Dispatch, useState } from "react";
 
-import "./LoginPage.css";
-
 import ChangePasswordForm from "./ChangePasswordForm";
 import LoginForm from "./LoginForm";
+import { ThemeType } from "./ThemeType";
 
-function LoginPage({ setIsLoggedIn }: { setIsLoggedIn: Dispatch<boolean> }) {
+function LoginPage({
+  themeType,
+  setIsLoggedIn,
+}: {
+  themeType: ThemeType;
+  setIsLoggedIn: Dispatch<boolean>;
+}) {
   const [requirePasswordChange, setRequirePasswordChange] = useState(false);
   const [logInError, setLogInError] = useState("");
   const [username, setUsername] = useState("");
@@ -14,9 +19,9 @@ function LoginPage({ setIsLoggedIn }: { setIsLoggedIn: Dispatch<boolean> }) {
     return (
       <div>
         <b>{logInError}</b>
-        <br />
 
         <ChangePasswordForm
+          themeType={themeType}
           username={username}
           setLogInError={setLogInError}
           setRequirePasswordChange={setRequirePasswordChange}
@@ -27,9 +32,9 @@ function LoginPage({ setIsLoggedIn }: { setIsLoggedIn: Dispatch<boolean> }) {
     return (
       <div>
         <b>{logInError}</b>
-        <br />
 
         <LoginForm
+          themeType={themeType}
           setIsLoggedIn={setIsLoggedIn}
           setLogInError={setLogInError}
           setRequirePasswordChange={setRequirePasswordChange}

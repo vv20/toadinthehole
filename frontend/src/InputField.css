@@ -1,0 +1,25 @@
+.InputField, &:focus {
+	outline: none;
+}
+
+.InputField-Notebook {
+	font-family: "Babylonica";
+	font-size: 25px;
+	border-bottom-color: #4a2a0a;
+	border-bottom-width: 0px;
+	border-top-width: 0;
+	border-left-width: 0;
+	border-right-width: 0;
+	background: none;
+	margin-bottom: 0;
+}
+
+.InputField-Pastel {
+	font-family: "Bona Nova";
+	font-size: 15px;
+	border-bottom-color: #5f86d2;
+	border-top: none;
+	border-left: none;
+	border-right: none;
+	background: none;
+}

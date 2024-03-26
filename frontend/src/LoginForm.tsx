@@ -1,14 +1,21 @@
 import { resetPassword, signIn } from "aws-amplify/auth";
 import { ChangeEvent, Dispatch, FormEvent, useState } from "react";
-
+import "./Button.css";
+import "./InputField.css";
+import "./InputLabel.css";
 import "./LoginForm.css";
+import "./LoginFormRow.css";
+import "./PageTitle.css";
+import { ThemeType } from "./ThemeType";
 
 function LoginForm({
+  themeType,
   setIsLoggedIn,
   setLogInError,
   setRequirePasswordChange,
   setUsername,
 }: {
+  themeType: ThemeType;
   setIsLoggedIn: Dispatch<boolean>;
   setLogInError: Dispatch<string>;
   setRequirePasswordChange: Dispatch<boolean>;
@@ -52,27 +59,40 @@ function LoginForm({
   }
 
   return (
-    <form onSubmit={handleSignIn}>
-      <label>Email:</label>
-      <input
-        type="text"
-        id="username"
-        name="username"
-        onChange={handleChange}
-      />
-      <br />
+    <div className={"LoginForm LoginForm-" + themeType}>
+      <h1 className={"PageTitle PageTitle-" + themeType}>Log In:</h1>
+      <form onSubmit={handleSignIn}>
+        <div className={"LoginFormRow LoginFormRow-" + themeType}>
+          <label className={"InputLabel InputLabel-" + themeType}>Email:</label>
+          <input
+            className={"InputField InputField-" + themeType}
+            type="text"
+            id="username"
+            name="username"
+            onChange={handleChange}
+          />
+        </div>
 
-      <label>Password:</label>
-      <input
-        type="text"
-        id="password"
-        name="password"
-        onChange={handleChange}
-      />
-      <br />
+        <div className={"LoginFormRow LoginFormRow-" + themeType}>
+          <label className={"InputLabel InputLabel-" + themeType}>
+            Password:
+          </label>
+          <input
+            className={"InputField InputField-" + themeType}
+            type="password"
+            id="password"
+            name="password"
+            onChange={handleChange}
+          />
+        </div>
 
-      <button type="submit">Log In</button>
-    </form>
+        <div className={"LoginFormRow LoginFormRow-" + themeType}>
+          <button className={"Button Button-" + themeType} type="submit">
+            Log In
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 

@@ -1,0 +1,20 @@
+.ThemeSelector {
+	border-right: none;
+	border-top: none;
+	border-bottom: none;
+	background-color: white;
+}
+
+.ThemeSelector-Notebook {
+	font-family: "Babylonica";
+	font-size: 20px;
+	border-left: none;
+}
+
+.ThemeSelector-Pastel {
+	font-family: "Bona Nova";
+	font-size: 15px;
+	color: #5f86d2;
+	border-left: block;
+	border-left-color: #5f86d2;
+}

@@ -1,0 +1,15 @@
+.LoginForm {
+	margin: auto;
+	width: 50%;
+}
+
+.LoginForm-Notebook {
+	line-height: 30px;
+	background-image: repeating-linear-gradient(#ffffe6 0px; #ffffe6 29px; #ac9985 30px);
+}
+
+.LoginForm-Pastel {
+	margin-top: 50px;
+	border-style: solid;
+	background-color: white;
+}

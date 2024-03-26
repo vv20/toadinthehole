@@ -1,0 +1,15 @@
+.Header {
+	display: flex;
+	justify-content: right;
+}
+
+.Header-Notebook {
+}
+
+.Header-Pastel {
+	background-color: white;
+	border-style: solid;
+	border-top-width: 0;
+	border-left-width: 0;
+	border-right-width: 0;
+}
