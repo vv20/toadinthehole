@@ -70,7 +70,8 @@ class ToadInTheHoleMainStack(Stack):
                 domain_name,
                 frontend_bucket,
                 image_bucket,
-                frontend_certificate)
+                frontend_certificate,
+                top_domain_name_access)
         self.configure_dns(environment, domain_name, zone, distribution, api)
         self.create_exports(environment, frontend_bucket)
 
@@ -369,12 +370,18 @@ class ToadInTheHoleMainStack(Stack):
             domain_name,
             frontend_bucket,
             image_bucket,
-            frontend_certificate):
+            frontend_certificate,
+            top_domain_name_access):
         oai = cloudfront.OriginAccessIdentity(
                 self,
                 Component.ORIGIN_ACCESS_IDENTITY.get_component_name(environment))
         frontend_bucket.grant_read(oai)
         image_bucket.grant_read(oai)
+
+        domain_names = [
+                Domain.FRONTEND.get_domain_name(environment, domain_name)]
+        if top_domain_name_access:
+            domain_names.append(domain_name)
 
         distribution = cloudfront.Distribution(
                 self,
@@ -391,7 +398,7 @@ class ToadInTheHoleMainStack(Stack):
                             origin_access_identity=oai))
                 },
                 certificate=frontend_certificate,
-                domain_names=[Domain.FRONTEND.get_domain_name(environment, domain_name)])
+                domain_names=domain_names)
 
         return distribution
 
