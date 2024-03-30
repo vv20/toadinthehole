@@ -18,6 +18,12 @@ jobs:
         with:
           ref: ${{ github.event.inputs.version }}
 
+      - name: Set up AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_CICD_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
