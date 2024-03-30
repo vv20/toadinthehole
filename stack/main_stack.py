@@ -30,9 +30,12 @@ class ToadInTheHoleMainStack(Stack):
         domain_name = self.node.try_get_context('domain_name')
         environment = self.node.try_get_context('environment')
         localhost_access = bool(self.node.try_get_context('localhost_access'))
+        top_domain_name_access = bool(self.node.try_get_context('top_domain_name_access'))
         allowed_origins = ['https://' + Domain.FRONTEND.get_domain_name(environment, domain_name)]
-        if (localhost_access):
+        if localhost_access:
             allowed_origins.append('http://localhost:3000')
+        if top_domain_name_access:
+            allowed_origins.append('http://' + domain_name)
 
         frontend_bucket, image_bucket = self.create_s3_buckets(environment)
         recipe_table = self.create_dynamodb_table(environment)
