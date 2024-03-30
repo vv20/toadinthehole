@@ -78,3 +78,9 @@ jobs:
           cdk_subcommand: 'deploy'
           cdk_stack: 'frontend-deployment-dev'
           cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=dev --exclusively'
+
+      - name: Tag version
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
