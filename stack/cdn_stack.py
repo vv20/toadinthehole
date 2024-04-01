@@ -12,9 +12,9 @@ class ToadInTheHoleCDNStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
         domain_name = self.node.try_get_context('domain_name')
         environment = self.node.try_get_context('environment')
-        top_domain_name_access = bool(self.node.try_get_context('top_domain_name_access'))
+        host_at_apex = bool(self.node.try_get_context('host_at_apex'))
         zone = self.lookup_zone(domain_name)
-        frontend_certificate = self.create_certificate(environment, domain_name, zone, top_domain_name_access)
+        frontend_certificate = self.create_certificate(environment, domain_name, zone, host_at_apex)
         self.frontend_certificate_arn = frontend_certificate.certificate_arn
 
     def lookup_zone(self, domain_name):
@@ -28,7 +28,7 @@ class ToadInTheHoleCDNStack(Stack):
             environment,
             domain_name,
             zone,
-            top_domain_name_access):
+            host_at_apex):
         acm.Certificate(
                 self,
                 Component.ENVIRONMENT_CERTIFICATE.get_component_name(environment),
@@ -36,7 +36,7 @@ class ToadInTheHoleCDNStack(Stack):
                 validation=acm.CertificateValidation.from_dns(zone))
 
         additional_domains = None
-        if top_domain_name_access:
+        if host_at_apex:
             additional_domains = [domain_name]
 
         frontend_certificate = acm.Certificate(

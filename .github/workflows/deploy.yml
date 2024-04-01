@@ -50,14 +50,14 @@ jobs:
         with:
           cdk_subcommand: 'deploy'
           cdk_stack: 'cdn-prod'
-          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=prod --exclusively --context top_domain_name_access=true'
+          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=prod --exclusively --context host_at_apex=true'
 
       - name: Build Main Stack
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'deploy'
           cdk_stack: 'main-prod'
-          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=prod --exclusively --context top_domain_name_access=true'
+          cdk_args: '--context domain_name=${{ vars.DEPLOYMENT_DOMAIN_NAME }} --context environment=prod --exclusively --context host_at_apex=true'
 
       - name: Configure Amplify
         run: |

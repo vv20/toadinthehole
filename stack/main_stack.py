@@ -30,11 +30,11 @@ class ToadInTheHoleMainStack(Stack):
         domain_name = self.node.try_get_context('domain_name')
         environment = self.node.try_get_context('environment')
         localhost_access = bool(self.node.try_get_context('localhost_access'))
-        top_domain_name_access = bool(self.node.try_get_context('top_domain_name_access'))
+        host_at_apex = bool(self.node.try_get_context('host_at_apex'))
         allowed_origins = ['https://' + Domain.FRONTEND.get_domain_name(environment, domain_name)]
         if localhost_access:
             allowed_origins.append('http://localhost:3000')
-        if top_domain_name_access:
+        if host_at_apex:
             allowed_origins.append('http://' + domain_name)
 
         frontend_bucket, image_bucket = self.create_s3_buckets(environment)
@@ -71,8 +71,14 @@ class ToadInTheHoleMainStack(Stack):
                 frontend_bucket,
                 image_bucket,
                 frontend_certificate,
-                top_domain_name_access)
-        self.configure_dns(environment, domain_name, zone, distribution, api)
+                host_at_apex)
+        self.configure_dns(
+                environment,
+                domain_name,
+                zone,
+                distribution,
+                api,
+                host_at_apex)
         self.create_exports(environment, frontend_bucket)
 
     def create_s3_buckets(self, environment):
@@ -371,7 +377,7 @@ class ToadInTheHoleMainStack(Stack):
             frontend_bucket,
             image_bucket,
             frontend_certificate,
-            top_domain_name_access):
+            host_at_apex):
         oai = cloudfront.OriginAccessIdentity(
                 self,
                 Component.ORIGIN_ACCESS_IDENTITY.get_component_name(environment))
@@ -380,7 +386,7 @@ class ToadInTheHoleMainStack(Stack):
 
         domain_names = [
                 Domain.FRONTEND.get_domain_name(environment, domain_name)]
-        if top_domain_name_access:
+        if host_at_apex:
             domain_names.append(domain_name)
 
         distribution = cloudfront.Distribution(
@@ -402,8 +408,15 @@ class ToadInTheHoleMainStack(Stack):
 
         return distribution
 
-    def configure_dns(self, environment, domain_name, zone, distribution, api):
-        route53.ARecord(
+    def configure_dns(
+            self,
+            environment,
+            domain_name,
+            zone,
+            distribution,
+            api,
+            host_at_apex):
+        frontend_record = route53.ARecord(
                 self,
                 Component.FRONTEND_ALIAS_RECORD.get_component_name(environment),
                 zone=zone,
@@ -417,6 +430,14 @@ class ToadInTheHoleMainStack(Stack):
                 record_name=Domain.API.get_domain_name(environment, domain_name),
                 target=route53.RecordTarget.from_alias(
                     route53_targets.ApiGateway(api)))
+        if host_at_apex:
+            route53.ARecord(
+                    self,
+                    Component.APEX_ALIAS_RECORD.get_component_name(environment),
+                    zone=zone,
+                    record_name=domain_name,
+                    target=route53.RecordTarget.from_alias(
+                        route53_targets.Route53RecordTarget(frontend_record)))
 
     def create_exports(self, environment, frontend_bucket):
         CfnOutput(

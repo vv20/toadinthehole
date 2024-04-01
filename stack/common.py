@@ -23,6 +23,7 @@ class LocalBundler:
 
 
 class Component(Enum):
+    APEX_ALIAS_RECORD              = 'apex_alias_record'
     API                            = 'api'
     API_ALIAS_RECORD               = 'api_alias_record'
     API_CERTIFICATE                = 'api_certificate'
