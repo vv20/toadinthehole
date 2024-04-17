@@ -4,3 +4,4 @@ cdk.out/*
 *.swp
 cdk.context.json
 backend/python/*
+.vscode/*
