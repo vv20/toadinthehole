@@ -1,17 +1,23 @@
-import { GroupBase } from "react-select";
-import { Dispatch } from "react";
+import { Dispatch, ReactNode } from "react";
+import Select, { GroupBase } from "react-select";
 import "./Header.css";
 import "./InputLabel.css";
+import "./HeaderLeft.css";
+import "./HeaderRight.css";
+import NewRecipeButton from "./NewRecipeButton";
 import "./ThemeSelector.css";
 import { ThemeType } from "./ThemeType";
-import Select from "react-select";
 
 function Header({
   themeType,
   setThemeType,
+  setActiveRecipe,
+  isLoggedIn,
 }: {
   themeType: ThemeType;
   setThemeType: Dispatch<ThemeType>;
+  setActiveRecipe: Dispatch<ReactNode>;
+  isLoggedIn: boolean;
 }) {
   const options: GroupBase<string>[] = [];
   Object.values(ThemeType).forEach((tt) => {
@@ -21,9 +27,19 @@ function Header({
     });
   });
 
+  const leftChildren: ReactNode[] = [];
+  if (isLoggedIn) {
+    leftChildren.push(
+      <NewRecipeButton
+        themeType={themeType}
+        setActiveRecipe={setActiveRecipe}
+      />
+    );
+  }
+
   return (
     <div className={"Header Header-" + themeType}>
-      <div className={"HeaderLeft HeaderLeft-" + themeType}></div>
+      <div className={"HeaderLeft HeaderLeft-" + themeType}>{leftChildren}</div>
       <div className={"HeaderRight HeaderRight-" + themeType}>
         <label className={"InputLabel InputLabel-" + themeType}>Theme:</label>
         <Select

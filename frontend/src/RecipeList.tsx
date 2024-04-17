@@ -6,7 +6,13 @@ import "./RecipeList.css";
 import RecipePreview from "./RecipePreview";
 import { ThemeType } from "./ThemeType";
 
-function RecipeList({ themeType }: { themeType: ThemeType }) {
+function RecipeList({
+  themeType,
+  activeRecipe,
+}: {
+  themeType: ThemeType;
+  activeRecipe: ReactNode;
+}) {
   const [recipes, setRecipes] = useState<Array<ReactNode>>([]);
 
   useEffect(() => {
@@ -47,6 +53,7 @@ function RecipeList({ themeType }: { themeType: ThemeType }) {
   return (
     <div className={"RecipeList RecipeList-" + themeType}>
       <h1 className={"PageTitle PageTitle-" + themeType}>Recipes:</h1>
+      {activeRecipe}
       {recipes}
     </div>
   );

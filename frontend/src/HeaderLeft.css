@@ -1,6 +1,7 @@
 .HeaderLeft {
-	justify-self: left;
 	width: fit-content;
 	display: flex;
 	justify-content: left;
+	margin-left: none;
+	margin-right: auto;
 }

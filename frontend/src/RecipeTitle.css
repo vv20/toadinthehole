@@ -1,0 +1,11 @@
+.RecipeTitle {
+	font-size: 25px;
+}
+
+.RecipeTitle-Notebook {
+	border-bottom-width: 1px;
+}
+
+.RecipeTitle-Pastel {
+	text-align: center;
+}

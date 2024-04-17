@@ -1,0 +1,16 @@
+.RecipeFormRow {
+	margin: auto;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	width: fit-content;
+}
+
+.RecipeFormRow-Notebook {
+	border-bottom-style: dotted;
+	border-bottom-color: #4a2a0a;
+	border-bottom-width: 1px;
+}
+
+.RecipeFormRow-Pastel {
+	margin-right: 29%;
+}
