@@ -293,7 +293,8 @@ class ToadInTheHoleMainStack(Stack):
                     allow_methods=apigateway.Cors.ALL_METHODS),
                 deploy_options=apigateway.StageOptions(
                     data_trace_enabled=True,
-                    logging_level=apigateway.MethodLoggingLevel.INFO,
+                    logging_level=apigateway.MethodLoggingLevel.DEBUG,
+                    data_trace_enabled=True,
                     access_log_destination=apigateway.LogGroupLogDestination(log_group)),
                 deploy=True)
 
