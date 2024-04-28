@@ -1,8 +1,17 @@
+type DocumentType = null | boolean | number | string | DocumentType[] | {
+    [prop: string]: DocumentType;
+};
+
 interface APIRecipePrevew {
   title?: string;
-  image_id?: string;
+  imageId?: string;
   description?: string;
   tags?: [string];
 }
 
-export type { APIRecipePrevew };
+interface APINewImageInfo {
+  imageId?: string;
+  presignedUrl?: string;
+}
+
+export type { APINewImageInfo, APIRecipePrevew, DocumentType };

@@ -8,4 +8,5 @@
 
 .RecipeTitle-Pastel {
 	text-align: center;
+	opacity: var(--pastel-opacity);
 }

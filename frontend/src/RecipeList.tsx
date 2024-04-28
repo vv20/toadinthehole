@@ -1,10 +1,10 @@
-import { get } from "aws-amplify/api";
-import { fetchAuthSession } from "aws-amplify/auth";
 import { ReactNode, useEffect, useState } from "react";
 
 import "./RecipeList.css";
 import RecipePreview from "./RecipePreview";
 import { ThemeType } from "./ThemeType";
+import { APIMethod, callAPI } from "./APIService";
+import { APIRecipePrevew, DocumentType } from "./APIModel";
 
 function RecipeList({
   themeType,
@@ -18,19 +18,8 @@ function RecipeList({
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const { idToken } = (await fetchAuthSession()).tokens ?? {};
-        const options = {
-          headers: {
-            Authorization: `${idToken?.toString()}`,
-          },
-        };
-        const restOperation = get({
-          apiName: "ToadInTheHoleAPI",
-          path: "/collection",
-          options: options,
-        });
-        const { body } = await restOperation.response;
-        const responseJson: any[] = Array.of(await body.json());
+        const recipeJson: DocumentType = await callAPI({ 'path': '/collection', 'apiMethod': APIMethod.GET });
+        const responseJson: APIRecipePrevew[] = Array.of(recipeJson) as APIRecipePrevew[];
 
         if (responseJson.length === 0) {
           return;

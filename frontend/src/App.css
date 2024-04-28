@@ -5,13 +5,13 @@
 }
 
 .App-Notebook {
-	font-family: "Babylonica";
-	color: #4a2a0a;
+	font-family: var(--notebook-font);
+	color: var(--notebook-color);
 }
 
 .App-Pastel {
-	font-family: "Bona Nova";
-	color: #5f86d2;
-	background-color: #f0ccba;
-	opacity: 70%;
+	font-family: var(--pastel-font);
+	color: var(--pastel-color);
+	background-color: var(--pastel-background-color);
+	opacity: var(--pastel-opacity);
 }

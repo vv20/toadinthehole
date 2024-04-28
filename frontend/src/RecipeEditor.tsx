@@ -6,6 +6,7 @@ import "./RecipeEditor.css";
 import "./RecipeFormRow.css";
 import "./RecipeTitle.css";
 import { ThemeType } from "./ThemeType";
+import ImageUpload from "./ImageUpload";
 
 function RecipeEditor({
   themeType,
@@ -16,6 +17,7 @@ function RecipeEditor({
 }) {
   const [formData, setFormData] = useState({
     title: recipe.title ? recipe.title : "Recipe Title",
+    imageId: recipe.imageId ? recipe.imageId : null,
     description: recipe.description ? recipe.description : "",
   });
 
@@ -29,6 +31,8 @@ function RecipeEditor({
   return (
     <div className={"RecipeEditor RecipeEditor-" + themeType}>
       <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
+      </div>
+      <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
         <input
           type="text"
           placeholder={formData.title}
@@ -40,6 +44,9 @@ function RecipeEditor({
           }
           onChange={handleChange}
         />
+      </div>
+      <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
+        <ImageUpload themeType={themeType} imageId={formData.imageId} setFormData={setFormData}/>
       </div>
       <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
         <textarea

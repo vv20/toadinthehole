@@ -2,8 +2,8 @@
 }
 
 .NewRecipeButton-Pastel {
-	font-family: "Bona Nova";
-	color: #5f86d2;
+	font-family: var(--pastel-font);
+	color: var(--pastel-color);
 	background-color: white;
 	border-left: none;
 	border-top: none;

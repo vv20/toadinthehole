@@ -3,9 +3,9 @@
 }
 
 .InputField-Notebook {
-	font-family: "Babylonica";
+	font-family: var(--notebook-font);
 	font-size: 25px;
-	border-bottom-color: #4a2a0a;
+	border-bottom-color: var(--notebook-color);
 	border-bottom-width: 0px;
 	border-top-width: 0;
 	border-left-width: 0;
@@ -15,9 +15,9 @@
 }
 
 .InputField-Pastel {
-	font-family: "Bona Nova";
+	font-family: var(--pastel-font);
 	font-size: 15px;
-	border-bottom-color: #5f86d2;
+	border-bottom-color: var(--pastel-color);
 	border-top: none;
 	border-left: none;
 	border-right: none;

@@ -7,7 +7,7 @@
 
 .LoginFormRow-Notebook {
 	border-bottom-style: dotted;
-	border-bottom-color: #4a2a0a;
+	border-bottom-color: var(--notebook-color);
 	border-bottom-width: 1px;
 }
 

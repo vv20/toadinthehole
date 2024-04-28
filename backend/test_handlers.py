@@ -24,6 +24,9 @@ def data_setup(mocker):
     mock_s3 = mocker.patch('image.s3')
     mock_s3.generate_presigned_url.return_value = 'https://presigned.url'
 
+    mock_uuid = mocker.patch('image.uuid')
+    mock_uuid.uuid4.return_value = '123-456-789'
+
 
 @pytest.mark.parametrize(
         'resource,scenario,expected_data_after_file_name',

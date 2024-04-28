@@ -1,8 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Babylonica&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bona+Nova:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
 
 html, body, #root {
   margin: 0;
   height: 100%;
   min-height: 100%;
+}
+
+:root {
+  --notebook-font: "Babylonica";
+  --notebook-color: #4a2a0a;
+
+  --pastel-font: "Bona Nova";
+  --pastel-color: #5f86d2;
+  --pastel-background-color: #f0ccba;
+  --pastel-opacity: 70%;
 }

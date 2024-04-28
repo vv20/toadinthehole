@@ -7,17 +7,17 @@
 }
 
 .ThemeSelector-Notebook {
-	font-family: "Babylonica";
+	font-family: var(--notebook-font);
 	font-size: 20px;
 	border-left: none;
 }
 
 .ThemeSelector-Pastel {
-	font-family: "Bona Nova";
+	font-family: var(--pastel-font);
 	font-size: 15px;
-	color: #5f86d2;
+	color: var(--pastel-color);
 	border-left: block;
-	border-left-color: #5f86d2;
+	border-left-color: var(--pastel-color);
 }
 
 .ThemeSelector-Pastel:hover {

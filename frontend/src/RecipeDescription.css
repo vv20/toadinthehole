@@ -1,5 +1,5 @@
 .RecipeDescription {
-	font-size: 10px;
+	width: 100%;
 }
 
 .RecipeDescription-Notebook {
@@ -7,5 +7,7 @@
 }
 
 .RecipeDescription-Pastel {
-	text-align: center;
+	font-size: 18px;
+	line-height: 20px;
+	opacity: var(--pastel-opacity);
 }

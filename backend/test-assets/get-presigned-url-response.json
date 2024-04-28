@@ -3,5 +3,5 @@
 	"headers": {
 		"Access-Control-Allow-Origin": "http://localhost:3000"
 	},
-	"body": "https://presigned.url"
+	"body": "{\"imageId\": \"123-456-789\", \"presignedUrl\": \"https://presigned.url\"}"
 }
