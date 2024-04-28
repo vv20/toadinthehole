@@ -17,6 +17,7 @@ function ImageUpload({
     if (event.target.files && event.target.files[0]) {
       // get a presigned URL
       const newImageInfo: APINewImageInfo = await callAPI({'path': '/image', 'apiMethod': APIMethod.GET}) as APINewImageInfo;
+      console.log(newImageInfo);
       if (!newImageInfo.presignedUrl || !newImageInfo.imageId) {
         console.log("Missing required information on the API response!")
         return;

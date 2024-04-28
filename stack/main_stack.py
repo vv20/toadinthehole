@@ -11,7 +11,6 @@ from aws_cdk import aws_logs as logs
 from aws_cdk import aws_route53 as route53
 from aws_cdk import aws_route53_targets as route53_targets
 from aws_cdk import aws_s3 as s3
-from constructs import Construct
 
 from stack.common import (Component, Domain, LocalBundler,
                           get_environment_domain)
@@ -35,7 +34,7 @@ class ToadInTheHoleMainStack(Stack):
         if localhost_access:
             allowed_origins.append('http://localhost:3000')
         if host_at_apex:
-            allowed_origins.append('http://' + domain_name)
+            allowed_origins.append('https://' + domain_name)
 
         frontend_bucket, image_bucket = self.create_s3_buckets(environment)
         recipe_table = self.create_dynamodb_table(environment)
@@ -62,7 +61,6 @@ class ToadInTheHoleMainStack(Stack):
                 recipe_handler,
                 collection_handler,
                 image_handler,
-                image_bucket,
                 api_certificate,
                 allowed_origins)
         distribution = self.create_cdn_distribution(
@@ -267,7 +265,6 @@ class ToadInTheHoleMainStack(Stack):
             recipe_handler,
             collection_handler,
             image_handler,
-            image_bucket,
             certificate,
             allowed_origins):
         authorizer = apigateway.CognitoUserPoolsAuthorizer(
@@ -291,7 +288,9 @@ class ToadInTheHoleMainStack(Stack):
                     domain_name=Domain.API.get_domain_name(environment, domain_name)),
                 default_cors_preflight_options=apigateway.CorsOptions(
                     allow_origins=allowed_origins,
-                    allow_credentials=True),
+                    allow_credentials=True,
+                    allow_headers=apigateway.Cors.DEFAULT_HEADERS,
+                    allow_methods=apigateway.Cors.ALL_METHODS),
                 deploy_options=apigateway.StageOptions(
                     data_trace_enabled=True,
                     logging_level=apigateway.MethodLoggingLevel.INFO,
