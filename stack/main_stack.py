@@ -294,7 +294,6 @@ class ToadInTheHoleMainStack(Stack):
                 deploy_options=apigateway.StageOptions(
                     data_trace_enabled=True,
                     logging_level=apigateway.MethodLoggingLevel.DEBUG,
-                    data_trace_enabled=True,
                     access_log_destination=apigateway.LogGroupLogDestination(log_group)),
                 deploy=True)
 
