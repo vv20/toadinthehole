@@ -30,11 +30,6 @@ class ToadInTheHoleMainStack(Stack):
         environment = self.node.try_get_context('environment')
         localhost_access = bool(self.node.try_get_context('localhost_access'))
         host_at_apex = bool(self.node.try_get_context('host_at_apex'))
-        allowed_origins = ['https://' + Domain.FRONTEND.get_domain_name(environment, domain_name)]
-        if localhost_access:
-            allowed_origins.append('http://localhost:3000')
-        if host_at_apex:
-            allowed_origins.append('https://' + domain_name)
 
         frontend_bucket, image_bucket = self.create_s3_buckets(environment)
         recipe_table = self.create_dynamodb_table(environment)
@@ -48,8 +43,7 @@ class ToadInTheHoleMainStack(Stack):
                 api_role,
                 lambda_role,
                 recipe_table,
-                image_bucket,
-                allowed_origins)
+                image_bucket)
         zone = self.lookup_zone(domain_name)
         api_certificate = self.create_certificate(environment, domain_name, zone)
         frontend_certificate = self.lookup_frontend_certificate(environment, frontend_certificate_arn)
@@ -61,8 +55,7 @@ class ToadInTheHoleMainStack(Stack):
                 recipe_handler,
                 collection_handler,
                 image_handler,
-                api_certificate,
-                allowed_origins)
+                api_certificate)
         distribution = self.create_cdn_distribution(
                 environment,
                 domain_name,
@@ -205,8 +198,7 @@ class ToadInTheHoleMainStack(Stack):
             api_role,
             lambda_role,
             recipe_table,
-            image_bucket,
-            allowed_origins):
+            image_bucket):
         lambda_kwargs = {
                 'code'       : lambda_.Code.from_asset(
                     'backend',
@@ -219,7 +211,6 @@ class ToadInTheHoleMainStack(Stack):
                 'environment': {
                     'RECIPE_TABLE_NAME': recipe_table.table_name,
                     'IMAGE_BUCKET_ARN': image_bucket.bucket_arn,
-                    'ALLOWED_ORIGINS': ','.join(allowed_origins)
                 }
         }
 
@@ -265,8 +256,7 @@ class ToadInTheHoleMainStack(Stack):
             recipe_handler,
             collection_handler,
             image_handler,
-            certificate,
-            allowed_origins):
+            certificate):
         authorizer = apigateway.CognitoUserPoolsAuthorizer(
                 self,
                 Component.USER_POOL_AUTHORIZER.get_component_name(environment),
@@ -287,7 +277,7 @@ class ToadInTheHoleMainStack(Stack):
                     certificate=certificate,
                     domain_name=Domain.API.get_domain_name(environment, domain_name)),
                 default_cors_preflight_options=apigateway.CorsOptions(
-                    allow_origins=allowed_origins,
+                    allow_origins=['*'],
                     allow_credentials=True,
                     allow_headers=apigateway.Cors.DEFAULT_HEADERS,
                     allow_methods=apigateway.Cors.ALL_METHODS),

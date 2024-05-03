@@ -1,10 +1,8 @@
-import os
 import traceback
 
 
 def build_response_body(code, text, event, headers={}):
-    if 'headers' in event and 'Origin' in event['headers'] and event['headers']['Origin'] in os.environ['ALLOWED_ORIGINS'].split(','):
-        headers['Access-Control-Allow-Origin'] = event['headers']['Origin']
+    headers['Access-Control-Allow-Origin'] = '*'
     return {
             'statusCode': code,
             'body': text,
