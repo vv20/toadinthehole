@@ -41,7 +41,8 @@ class ToadInTheHoleMainStack(Stack):
                 environment,
                 api_role,
                 lambda_role,
-                recipe_table)
+                recipe_table,
+                image_bucket)
         zone = self.lookup_zone(domain_name)
         api_certificate = self.create_certificate(environment, domain_name, zone)
         frontend_certificate = self.lookup_frontend_certificate(environment, frontend_certificate_arn)
@@ -195,7 +196,8 @@ class ToadInTheHoleMainStack(Stack):
             environment,
             api_role,
             lambda_role,
-            recipe_table):
+            recipe_table,
+            image_bucket):
         lambda_kwargs = {
                 'code'       : lambda_.Code.from_asset(
                     'backend',
@@ -207,7 +209,7 @@ class ToadInTheHoleMainStack(Stack):
                 'runtime'    : lambda_.Runtime.PYTHON_3_9,
                 'environment': {
                     'RECIPE_TABLE_NAME': recipe_table.table_name,
-                    'IMAGE_BUCKET_NAME': Component.IMAGE_BUCKET.get_component_name(environment),
+                    'IMAGE_BUCKET_NAME': image_bucket.bucket_name,
                 }
         }
 
