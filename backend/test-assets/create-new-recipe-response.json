@@ -1,7 +1,7 @@
 {
 	"statusCode": 201,
 	"headers": {
-		"Access-Control-Allow-Origin": "http://localhost:3000"
+		"Access-Control-Allow-Origin": "*"
 	},
 	"body": "OK"
 }

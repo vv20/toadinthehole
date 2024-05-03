@@ -1,7 +1,7 @@
 {
 	"statusCode": 200,
 	"headers": {
-		"Access-Control-Allow-Origin": "http://localhost:3000"
+		"Access-Control-Allow-Origin": "*"
 	},
 	"body": "{\"recipes\": [{\"slug\": \"recipe1\", \"name\": \"Recipe 1\", \"description\": \"The first recipe ever\", \"image_id\": \"image_id1\", \"tags\": [\"tag1\", \"tag2\"]}, {\"slug\": \"recipe2\", \"name\": \"Recipe 2\", \"description\": \"The second recipe ever\", \"image_id\": \"image_id2\", \"tags\": [\"tag1\", \"tag3\"]}], \"tags\": [\"tag1\", \"tag2\", \"tag3\"]}"
 }
