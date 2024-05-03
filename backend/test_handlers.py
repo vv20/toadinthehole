@@ -13,7 +13,7 @@ RECIPES_TABLE = InMemoryDatabaseTable()
 @pytest.fixture
 def data_setup(mocker):
     os.environ['ALLOWED_ORIGINS'] = 'http://localhost:3000'
-    os.environ['IMAGE_BUCKET_ARN'] = 'image_bucket_arn'
+    os.environ['IMAGE_BUCKET_NAME'] = 'image_bucket_name'
     os.environ['RECIPE_TABLE_NAME'] = 'recipe_table_name'
 
     mock_dynamodb = mocker.patch('model.dynamodb')

@@ -12,7 +12,7 @@ def get_presigned_url(event):
     presigned_url = s3.generate_presigned_url(
             ClientMethod='put_object',
             Params = {
-                'Bucket': os.environ['IMAGE_BUCKET_ARN'],
+                'Bucket': os.environ['IMAGE_BUCKET_NAME'],
                 'Key': image_id + '.jpg',
                 'ContentType': 'image/jpeg',
                 'ACL': 'public-read'

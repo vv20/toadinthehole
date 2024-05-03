@@ -28,7 +28,6 @@ class ToadInTheHoleMainStack(Stack):
 
         domain_name = self.node.try_get_context('domain_name')
         environment = self.node.try_get_context('environment')
-        localhost_access = bool(self.node.try_get_context('localhost_access'))
         host_at_apex = bool(self.node.try_get_context('host_at_apex'))
 
         frontend_bucket, image_bucket = self.create_s3_buckets(environment)
@@ -42,8 +41,7 @@ class ToadInTheHoleMainStack(Stack):
                 environment,
                 api_role,
                 lambda_role,
-                recipe_table,
-                image_bucket)
+                recipe_table)
         zone = self.lookup_zone(domain_name)
         api_certificate = self.create_certificate(environment, domain_name, zone)
         frontend_certificate = self.lookup_frontend_certificate(environment, frontend_certificate_arn)
@@ -197,8 +195,7 @@ class ToadInTheHoleMainStack(Stack):
             environment,
             api_role,
             lambda_role,
-            recipe_table,
-            image_bucket):
+            recipe_table):
         lambda_kwargs = {
                 'code'       : lambda_.Code.from_asset(
                     'backend',
@@ -210,7 +207,7 @@ class ToadInTheHoleMainStack(Stack):
                 'runtime'    : lambda_.Runtime.PYTHON_3_9,
                 'environment': {
                     'RECIPE_TABLE_NAME': recipe_table.table_name,
-                    'IMAGE_BUCKET_ARN': image_bucket.bucket_arn,
+                    'IMAGE_BUCKET_NAME': Component.IMAGE_BUCKET.get_component_name(environment),
                 }
         }
 
