@@ -5,7 +5,7 @@ import uuid
 import boto3
 from common import build_response_body, create_handler
 
-s3 = boto3.resource('s3')
+s3 = boto3.client('s3')
 
 def get_presigned_url(event):
     image_id = str(uuid.uuid4())
