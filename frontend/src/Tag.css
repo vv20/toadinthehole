@@ -1,0 +1,13 @@
+.Tag {
+    display: flex;
+    width: fit-content;
+}
+
+.Tag-Notebook {
+}
+
+.Tag-Pastel {
+    background-color: var(--pastel-color);
+    color: white;
+    margin: 2px;
+}
