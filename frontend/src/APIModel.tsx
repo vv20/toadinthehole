@@ -2,14 +2,14 @@ type DocumentType = null | boolean | number | string | DocumentType[] | {
     [prop: string]: DocumentType;
 };
 
-interface APIRecipePrevew {
+type APIRecipePrevew = {
   title?: string;
   imageId?: string;
   description?: string;
-  tags?: [string];
+  tags?: string[];
 }
 
-interface APINewImageInfo {
+type APINewImageInfo = {
   imageId?: string;
   presignedUrl?: string;
 }

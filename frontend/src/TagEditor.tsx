@@ -1,9 +1,9 @@
 import { ChangeEvent, Dispatch, KeyboardEvent, ReactNode, SetStateAction } from "react";
 import { ThemeType } from "./ThemeType";
-import { InternalRecipe } from "./InternalModel";
 import Tag from "./Tag";
 import "./NewTag.css";
 import "./TagEditor.css";
+import { APIRecipePrevew } from "./APIModel";
 
 function TagEditor({
   themeType,
@@ -12,7 +12,7 @@ function TagEditor({
 }: {
   themeType: ThemeType,
   tags?: string[],
-  setFormData: Dispatch<SetStateAction<InternalRecipe>>,
+  setFormData: Dispatch<SetStateAction<APIRecipePrevew>>,
 }) {
   function createNewTag(tag: string) {
     if (tag === "") {

@@ -2,8 +2,7 @@ import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import "./ImageUpload.css";
 import { ThemeType } from "./ThemeType";
 import { APIMethod, callAPI } from "./APIService";
-import { APINewImageInfo } from "./APIModel";
-import { InternalRecipe } from "./InternalModel";
+import { APINewImageInfo, APIRecipePrevew } from "./APIModel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 
@@ -13,8 +12,8 @@ function ImageUpload({
   setFormData,
 }: {
   themeType: ThemeType,
-  imageId: string | null,
-  setFormData: Dispatch<SetStateAction<InternalRecipe>>,
+  imageId?: string,
+  setFormData: Dispatch<SetStateAction<APIRecipePrevew>>,
 }) {
   async function uploadImage(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.files && event.target.files[0]) {

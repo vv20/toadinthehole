@@ -9,6 +9,7 @@ dynamodb = boto3.resource('dynamodb')
 
 class Recipe:
     def __init__(self, slug=None, item=None):
+        print("Recipe: " + item)
         self.table = dynamodb.Table(os.environ['RECIPE_TABLE_NAME'])
         self.slug = slug
         self.exists = False

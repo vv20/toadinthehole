@@ -7,12 +7,19 @@ enum APIMethod {
     POST,
 }
 
-async function callAPI({ path, apiMethod }: { path: string, apiMethod: APIMethod }): Promise<DocumentType> {
+type APICallArguments = {
+    path: string;
+    apiMethod: APIMethod;
+    requestBody?: DocumentType | FormData;
+}
+
+async function callAPI({ path, apiMethod, requestBody }: APICallArguments): Promise<DocumentType> {
     const { idToken } = (await fetchAuthSession()).tokens ?? {};
     const options = {
         headers: {
             Authorization: `${idToken?.toString()}`,
         },
+        body: requestBody,
     };
     var methodFn;
     switch (apiMethod) {

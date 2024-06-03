@@ -1,9 +1,9 @@
 import { Dispatch, SetStateAction } from "react";
 import { ThemeType } from "./ThemeType";
-import { InternalRecipe } from "./InternalModel";
 import "./Tag.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
+import { APIRecipePrevew } from "./APIModel";
 
 function Tag({
     themeType,
@@ -12,7 +12,7 @@ function Tag({
 }: {
     themeType: ThemeType,
     tag: string,
-    setFormData: Dispatch<SetStateAction<InternalRecipe>>,
+    setFormData: Dispatch<SetStateAction<APIRecipePrevew>>,
 }) {
     function removeTag(tag: string) {
         return () => {
