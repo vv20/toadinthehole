@@ -19,7 +19,7 @@ class Recipe:
         # try to fetch the recipe from the database
         queryResponse = self.table.get_item(
             Key = {
-                'slug': slug
+                'slug': self.slug
             }
         )
         if 'Item' in queryResponse:
