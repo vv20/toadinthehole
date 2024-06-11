@@ -22,19 +22,18 @@ class Recipe:
                 'slug': self.slug
             }
         )
+        stored_item = {}
         if 'Item' in queryResponse:
             self.exists = True
-            self.name = queryResponse['Item']['name']
-            self.description = queryResponse['Item']['description']
-            self.image_id = queryResponse['Item']['image_id']
-            self.tags = queryResponse['Item']['tags']
-
-        # override remote attributes with local ones
+            stored_item = queryResponse['Item']
+        received_item = {}
         if item is not None:
-            self.name = item['name']
-            self.description = item['description']
-            self.image_id = item['image_id']
-            self.tags = item['tags']
+            received_item = item
+
+        self.name = get_attribute(stored_item, received_item, 'name', default='')
+        self.description = get_attribute(stored_item, received_item, 'description', default='')
+        self.image_id = get_attribute(stored_item, received_item, 'image_id', default=None)
+        self.tags = get_attribute(stored_item, received_item, 'tags', default=[])
 
     def toDict(self):
         return {
@@ -108,3 +107,11 @@ class RecipeCollection:
             'recipes': [r.toDict() for r in self.recipes],
             'tags': sorted(list(self.tags))
         })
+
+def get_attribute(stored_item, received_item, attribute_name, default=None):
+    result = default
+    if attribute_name in stored_item:
+        result = stored_item[attribute_name]
+    if attribute_name in received_item:
+        result = received_item[attribute_name]
+    return result
