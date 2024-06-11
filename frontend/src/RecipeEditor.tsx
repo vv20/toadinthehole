@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import { APIRecipePrevew, DocumentType } from "./APIModel";
+import { APIRecipePrevew } from "./APIModel";
 import "./InputField.css";
 import "./RecipeDescription.css";
 import "./RecipeEditor.css";
