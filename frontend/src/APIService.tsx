@@ -11,9 +11,15 @@ type APICallArguments = {
     path: string;
     apiMethod: APIMethod;
     requestBody?: DocumentType | FormData;
+    parseResponseJson: boolean;
 }
 
-async function callAPI({ path, apiMethod, requestBody }: APICallArguments): Promise<DocumentType> {
+async function callAPI({
+    path,
+    apiMethod,
+    requestBody,
+    parseResponseJson
+}: APICallArguments): Promise<DocumentType> {
     const { idToken } = (await fetchAuthSession()).tokens ?? {};
     const options = {
         headers: {
@@ -38,7 +44,12 @@ async function callAPI({ path, apiMethod, requestBody }: APICallArguments): Prom
         options: options,
     });
     const { body } = await restOperation.response;
-    return body.json();
+    if (parseResponseJson) {
+        return body.json();
+    }
+    else {
+        return body.text();
+    }
 }
 
 export { callAPI, APIMethod }

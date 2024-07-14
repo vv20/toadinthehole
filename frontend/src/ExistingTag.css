@@ -1,0 +1,13 @@
+.ExistingTag {
+    display: flex;
+    width: fit-content;
+}
+
+.ExistingTag-Notebook {
+}
+
+.ExistingTag-Pastel {
+    margin: 2px;
+    color: var(--pastel-color);
+    background-color: white;
+}

@@ -16,6 +16,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [themeType, setThemeType] = useState<ThemeType>(ThemeType.Pastel);
   const [activeRecipe, setActiveRecipe] = useState<ReactNode>();
+  const [existingTags, setExistingTags] = useState<string[]>([]);
 
   useEffect(() => {
     const checkLogIn = async () => {
@@ -34,16 +35,24 @@ function App() {
   if (!isLoggedIn) {
     child = <LoginPage setIsLoggedIn={setIsLoggedIn} themeType={themeType} />;
   } else {
-    child = <RecipeList themeType={themeType} activeRecipe={activeRecipe} />;
+    child = (
+      <RecipeList
+        themeType={themeType}
+        activeRecipe={activeRecipe}
+        setActiveRecipe={setActiveRecipe}
+        setExistingTags={setExistingTags}
+      />
+    );
   }
 
   return (
     <div className={"App App-" + themeType}>
       <Header
         themeType={themeType}
+        isLoggedIn={isLoggedIn}
+        existingTags={existingTags}
         setThemeType={setThemeType}
         setActiveRecipe={setActiveRecipe}
-        isLoggedIn={isLoggedIn}
       />
       {child}
     </div>

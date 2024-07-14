@@ -1,4 +1,4 @@
-.RecipeEditor {
+.Recipe {
     position: fixed;
     width: 50%;
     height: 75%;
@@ -6,10 +6,10 @@
     top: 10%;
 }
 
-.RecipeEditor-Notebook {
+.Recipe-Notebook {
 }
 
-.RecipeEditor-Pastel {
+.Recipe-Pastel {
 	border-style: solid;
     width: 75%;
     margin: auto;

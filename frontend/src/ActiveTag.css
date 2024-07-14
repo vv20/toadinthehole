@@ -1,13 +1,13 @@
-.Tag {
+.ActiveTag {
     display: flex;
     width: fit-content;
 }
 
-.Tag-Notebook {
+.ActiveTag-Notebook {
 }
 
-.Tag-Pastel {
+.ActiveTag-Pastel {
+    margin: 2px;
     background-color: var(--pastel-color);
     color: white;
-    margin: 2px;
 }

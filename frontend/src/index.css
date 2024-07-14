@@ -14,6 +14,7 @@ html, body, #root {
 
   --pastel-font: "Bona Nova";
   --pastel-color: #5f86d2;
+  --pastel-highlight-color: #5facd2;
   --pastel-background-color: #f0ccba;
   --pastel-opacity: 70%;
 }

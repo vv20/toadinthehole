@@ -1,17 +1,20 @@
 import { ChangeEvent, Dispatch, KeyboardEvent, ReactNode, SetStateAction } from "react";
 import { ThemeType } from "./ThemeType";
-import Tag from "./Tag";
+import ActiveTag from "./ActiveTag";
 import "./NewTag.css";
 import "./TagEditor.css";
 import { APIRecipePrevew } from "./APIModel";
+import ExistingTag from "./ExistingTag";
 
 function TagEditor({
   themeType,
   tags,
+  existingTags,
   setFormData,
 }: {
   themeType: ThemeType,
   tags?: string[],
+  existingTags: string[],
   setFormData: Dispatch<SetStateAction<APIRecipePrevew>>,
 }) {
   function createNewTag(tag: string) {
@@ -46,11 +49,28 @@ function TagEditor({
     createNewTag(value);
   }
 
-  const tagElements: Array<ReactNode> = [];
+  const activeTagElements: Array<ReactNode> = [];
   if (tags !== undefined) {
     for (var i = 0; i < tags.length; i++) {
-      tagElements.push(<Tag themeType={themeType} tag={tags[i]} setFormData={setFormData} />);
+      activeTagElements.push(
+        <ActiveTag
+          themeType={themeType}
+          tag={tags[i]}
+          setFormData={setFormData} 
+        />
+      );
     }
+  }
+
+  const existingTagElements: Array<ReactNode> = [];
+  for (i = 0; i < existingTags.length; i++) {
+    existingTagElements.push(
+      <ExistingTag
+        themeType={themeType}
+        tag={existingTags[i]}
+        createNewTag={createNewTag}
+      />
+    );
   }
 
   return (
@@ -61,7 +81,8 @@ function TagEditor({
         className={"NewTag NewTag-" + themeType}
         onKeyDown={handleEnter}
         onBlur={handleBlur} />
-      {tagElements}
+      {activeTagElements}
+      {existingTagElements}
     </div>
   );
 }

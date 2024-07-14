@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { Dispatch, ReactNode, useEffect, useState } from "react";
 
 import "./RecipeList.css";
 import RecipePreview from "./RecipePreview";
@@ -9,40 +9,45 @@ import { APIRecipePrevew, DocumentType } from "./APIModel";
 function RecipeList({
   themeType,
   activeRecipe,
+  setActiveRecipe,
+  setExistingTags,
 }: {
   themeType: ThemeType;
   activeRecipe: ReactNode;
+  setActiveRecipe: Dispatch<ReactNode>;
+  setExistingTags: Dispatch<string[]>;
 }) {
   const [recipes, setRecipes] = useState<Array<ReactNode>>([]);
 
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const recipeJson: DocumentType = await callAPI({ 'path': '/collection', 'apiMethod': APIMethod.GET });
-        const responseJson: APIRecipePrevew[] = Array.of(recipeJson) as APIRecipePrevew[];
+        const recipeJson: DocumentType = await callAPI({
+          'path': '/collection',
+          'apiMethod': APIMethod.GET,
+          parseResponseJson: true,
+        }) as {[key: string]: DocumentType};
+        const recipePreviews: APIRecipePrevew[] = recipeJson.recipes as APIRecipePrevew[];
+        const recipePreviewNodes: ReactNode[] = [];
 
-        if (responseJson.length === 0) {
-          return;
-        }
-
-        const recipePreviews: ReactNode[] = [];
-        for (var i = 0; i < responseJson.length; i++) {
-          recipePreviews.push(
-            <RecipePreview themeType={themeType} preview={responseJson[i]} />
+        for (var i = 0; i < recipePreviews.length; i++) {
+          recipePreviewNodes.push(
+            <RecipePreview themeType={themeType} preview={recipePreviews[i]} setActiveRecipe={setActiveRecipe}/>
           );
         }
-        setRecipes(recipePreviews);
+        setRecipes(recipePreviewNodes);
+        setExistingTags(recipeJson.tags as string[]);
       } catch (e) {
         console.log("Error while fetching recipes:", e);
       }
     };
     fetchRecipes();
-  }, [themeType]);
+  }, [themeType, setActiveRecipe, setExistingTags]);
 
   return (
     <div className={"RecipeList RecipeList-" + themeType}>
       <h1 className={"PageTitle PageTitle-" + themeType}>Recipes:</h1>
-      {activeRecipe}
+        {activeRecipe}
       {recipes}
     </div>
   );

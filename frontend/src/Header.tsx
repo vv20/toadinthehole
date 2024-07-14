@@ -10,14 +10,16 @@ import { ThemeType } from "./ThemeType";
 
 function Header({
   themeType,
+  isLoggedIn,
+  existingTags,
   setThemeType,
   setActiveRecipe,
-  isLoggedIn,
 }: {
   themeType: ThemeType;
+  isLoggedIn: boolean;
+  existingTags: string[];
   setThemeType: Dispatch<ThemeType>;
   setActiveRecipe: Dispatch<ReactNode>;
-  isLoggedIn: boolean;
 }) {
   const options: GroupBase<string>[] = [];
   Object.values(ThemeType).forEach((tt) => {
@@ -32,6 +34,7 @@ function Header({
     leftChildren.push(
       <NewRecipeButton
         themeType={themeType}
+        existingTags={existingTags}
         setActiveRecipe={setActiveRecipe}
       />
     );

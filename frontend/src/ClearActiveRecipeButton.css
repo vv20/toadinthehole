@@ -1,0 +1,15 @@
+.ClearActiveRecipeButton {
+    position: fixed;
+    top: 15%;
+    right: 15%;
+}
+
+.ClearActiveRecipeButton-Notebook {
+}
+
+.ClearActiveRecipeButton-Pastel {
+}
+
+.ClearActiveRecipeButton-Pastel:hover {
+    color: var(--pastel-highlight-color);
+}

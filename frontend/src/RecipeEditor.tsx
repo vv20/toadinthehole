@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, Dispatch, ReactNode, useState } from "react";
 import { APIRecipePrevew } from "./APIModel";
 import "./InputField.css";
 import "./RecipeDescription.css";
@@ -11,13 +11,18 @@ import { ThemeType } from "./ThemeType";
 import ImageUpload from "./ImageUpload";
 import TagEditor from "./TagEditor";
 import { APIMethod, callAPI } from "./APIService";
+import ClearActiveRecipeButton from "./ClearActiveRecipeButton";
 
 function RecipeEditor({
   themeType,
   recipe,
+  existingTags,
+  setActiveRecipe
 }: {
   themeType: ThemeType;
   recipe: APIRecipePrevew;
+  existingTags: string[];
+  setActiveRecipe: Dispatch<ReactNode>;
 }) {
   const [formData, setFormData] = useState<APIRecipePrevew>(recipe);
 
@@ -30,9 +35,10 @@ function RecipeEditor({
 
   function submitRecipe() {
     callAPI({
-      'path': '/recipe',
-      'apiMethod': APIMethod.POST,
-      'requestBody': formData,
+      path: '/recipe',
+      apiMethod: APIMethod.POST,
+      requestBody: formData,
+      parseResponseJson: false
     })
   }
 
@@ -42,7 +48,7 @@ function RecipeEditor({
         <input
           name="name"
           type="text"
-          placeholder={formData.title}
+          placeholder={formData.name}
           className={
             "InputField InputField-" +
             themeType +
@@ -51,6 +57,7 @@ function RecipeEditor({
           }
           onChange={handleChange}
         />
+        <ClearActiveRecipeButton themeType={themeType} setActiveRecipe={setActiveRecipe} />
       </div>
       <div style={{display: 'flex'}}>
         <div className={"RecipeEditorLeft RecipeEditorLeft-" + themeType}>
@@ -73,7 +80,11 @@ function RecipeEditor({
         </div>
         <div className={"RecipeEditorRight RecipeEditorRight-" + themeType}>
           <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
-            <TagEditor themeType={themeType} tags={formData.tags} setFormData={setFormData} />
+            <TagEditor
+              themeType={themeType}
+              tags={formData.tags}
+              existingTags={existingTags}
+              setFormData={setFormData} />
           </div>
           <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
             <button className={"Button Button-" + themeType} onClick={submitRecipe}>Submit</button>

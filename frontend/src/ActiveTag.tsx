@@ -1,11 +1,11 @@
 import { Dispatch, SetStateAction } from "react";
 import { ThemeType } from "./ThemeType";
-import "./Tag.css";
+import "./ActiveTag.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { APIRecipePrevew } from "./APIModel";
 
-function Tag({
+function ActiveTag({
     themeType,
     tag,
     setFormData,
@@ -33,11 +33,11 @@ function Tag({
     }
 
     return (
-        <div className={"Tag Tag-" + themeType}>
+        <div className={"ActiveTag ActiveTag-" + themeType}>
             #{tag}
             <FontAwesomeIcon id={tag} icon={faX} onClick={removeTag(tag)} />
         </div>
     );
 }
 
-export default Tag;
+export default ActiveTag;
