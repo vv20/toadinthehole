@@ -9,11 +9,13 @@ import { APIRecipePrevew, DocumentType } from "./APIModel";
 function RecipeList({
   themeType,
   activeRecipe,
+  existingTags,
   setActiveRecipe,
   setExistingTags,
 }: {
   themeType: ThemeType;
   activeRecipe: ReactNode;
+  existingTags: string[];
   setActiveRecipe: Dispatch<ReactNode>;
   setExistingTags: Dispatch<string[]>;
 }) {
@@ -32,7 +34,11 @@ function RecipeList({
 
         for (var i = 0; i < recipePreviews.length; i++) {
           recipePreviewNodes.push(
-            <RecipePreview themeType={themeType} preview={recipePreviews[i]} setActiveRecipe={setActiveRecipe}/>
+            <RecipePreview
+              themeType={themeType}
+              preview={recipePreviews[i]}
+              existingTags={existingTags}
+              setActiveRecipe={setActiveRecipe}/>
           );
         }
         setRecipes(recipePreviewNodes);
@@ -42,7 +48,7 @@ function RecipeList({
       }
     };
     fetchRecipes();
-  }, [themeType, setActiveRecipe, setExistingTags]);
+  }, [themeType, existingTags, setActiveRecipe, setExistingTags]);
 
   return (
     <div className={"RecipeList RecipeList-" + themeType}>

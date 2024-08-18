@@ -39,6 +39,7 @@ function App() {
       <RecipeList
         themeType={themeType}
         activeRecipe={activeRecipe}
+        existingTags={existingTags}
         setActiveRecipe={setActiveRecipe}
         setExistingTags={setExistingTags}
       />

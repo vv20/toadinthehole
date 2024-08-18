@@ -7,10 +7,12 @@ import Recipe from "./Recipe";
 function RecipePreview({
   themeType,
   preview,
+  existingTags,
   setActiveRecipe
 }: {
   themeType: ThemeType;
   preview: APIRecipePrevew;
+  existingTags: string[];
   setActiveRecipe: Dispatch<ReactNode>;
 }) {
   function openRecipe() {
@@ -18,6 +20,7 @@ function RecipePreview({
       <Recipe
         themeType={themeType}
         preview={preview}
+        existingTags={existingTags}
         setActiveRecipe={setActiveRecipe}
       />
     );
