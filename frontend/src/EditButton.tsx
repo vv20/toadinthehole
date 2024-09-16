@@ -17,7 +17,6 @@ function EditButton({
   setActiveRecipe: Dispatch<ReactNode>;
 }) {
     function editCurrentRecipe() {
-        console.log("boop");
         setActiveRecipe(
             <RecipeEditor
                 themeType={themeType}
