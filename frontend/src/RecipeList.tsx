@@ -32,6 +32,11 @@ function RecipeList({
         const recipePreviews: APIRecipePrevew[] = recipeJson.recipes as APIRecipePrevew[];
         const recipePreviewNodes: ReactNode[] = [];
 
+        if (recipePreviews.length == recipes.length) {
+          // recipes already set - avoid infinite loop
+          return;
+        }
+
         for (var i = 0; i < recipePreviews.length; i++) {
           recipePreviewNodes.push(
             <RecipePreview
