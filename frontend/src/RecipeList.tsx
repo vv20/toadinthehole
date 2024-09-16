@@ -53,8 +53,10 @@ function RecipeList({
   return (
     <div className={"RecipeList RecipeList-" + themeType}>
       <h1 className={"PageTitle PageTitle-" + themeType}>Recipes:</h1>
-        {activeRecipe}
-      {recipes}
+      {activeRecipe}
+      <div style={{display: 'flex', flexWrap: 'wrap'}}>
+        {recipes}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 .RecipePreview {
 	margin: auto;
-	width: 33%;
+	width: 25%;
+	margin-bottom: 5%;
 }
 
 .RecipePreview-Notebook {
