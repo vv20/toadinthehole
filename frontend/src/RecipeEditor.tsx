@@ -40,6 +40,17 @@ function RecipeEditor({
       requestBody: formData,
       parseResponseJson: false
     })
+    setActiveRecipe(<div></div>);
+  }
+
+  function deleteRecipe() {
+    callAPI({
+      path: '/recipe?recipeID=' + recipe.slug,
+      apiMethod: APIMethod.DELETE,
+      requestBody: {},
+      parseResponseJson: false
+    })
+    setActiveRecipe(<div></div>);
   }
 
   return (
@@ -62,7 +73,7 @@ function RecipeEditor({
       <div style={{display: 'flex'}}>
         <div className={"RecipeEditorLeft RecipeEditorLeft-" + themeType}>
           <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
-            <ImageUpload themeType={themeType} imageId={formData.imageId} setFormData={setFormData}/>
+            <ImageUpload themeType={themeType} imageId={formData.image_id} setFormData={setFormData}/>
           </div>
           <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
             <textarea
@@ -87,6 +98,7 @@ function RecipeEditor({
               setFormData={setFormData} />
           </div>
           <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
+            <button className={"Button Button-" + themeType} onClick={deleteRecipe}>Delete</button>
             <button className={"Button Button-" + themeType} onClick={submitRecipe}>Submit</button>
           </div>
         </div>

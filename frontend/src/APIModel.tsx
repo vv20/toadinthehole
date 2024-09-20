@@ -3,8 +3,9 @@ type DocumentType = null | boolean | number | string | DocumentType[] | {
 };
 
 type APIRecipePrevew = {
+  slug?: string;
   name?: string;
-  imageId?: string;
+  image_id?: string;
   description?: string;
   tags?: string[];
 }

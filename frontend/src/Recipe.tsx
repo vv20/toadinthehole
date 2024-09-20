@@ -46,7 +46,7 @@ function Recipe({
         <div style={{display: 'flex'}}>
           <div className={"RecipeEditorLeft RecipeEditorLeft-" + themeType}>
             <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
-              <img src={"/image/" + preview.imageId} alt="no pic :("/>
+              <img src={"/image/" + preview.image_id} alt="no pic :("/>
             </div>
             <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
               <p>{preview.description}</p>

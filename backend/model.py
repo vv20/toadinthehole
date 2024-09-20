@@ -73,7 +73,7 @@ class Recipe:
     def delete(self):
         if not self.exists:
             return
-        self.table.delete_items(
+        self.table.delete_item(
                 Key={
                     'slug': self.slug
                 })

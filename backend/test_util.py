@@ -15,7 +15,7 @@ class InMemoryDatabaseTable:
         mock_table.get_item.side_effect = self.get_item
         mock_table.update_item.side_effect = self.update_item
         mock_table.put_item.side_effect = self.put_item
-        mock_table.delete_items.side_effect = self.delete_items
+        mock_table.delete_item.side_effect = self.delete_items
 
     def scan(self, *args, **kwargs):
         result = self.rows
