@@ -10,7 +10,7 @@ import "./RecipeTitle.css";
 import { ThemeType } from "./ThemeType";
 import ImageUpload from "./ImageUpload";
 import TagEditor from "./TagEditor";
-import { APIMethod, callAPI } from "./APIService";
+import { APICallResponse, APIMethod, callAPI } from "./APIService";
 import ClearActiveRecipeButton from "./ClearActiveRecipeButton";
 
 function RecipeEditor({
@@ -33,23 +33,31 @@ function RecipeEditor({
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   }
 
-  function submitRecipe() {
-    callAPI({
-      path: '/recipe',
+  async function submitRecipe() {
+    const response: APICallResponse = await callAPI({
+      path: '/recipe?recipeID=' + recipe.slug,
       apiMethod: APIMethod.POST,
       requestBody: formData,
       parseResponseJson: false
-    })
+    });
+    if (!response.success) {
+      // TODO: alert the user
+      return;
+    }
     setActiveRecipe(<div></div>);
   }
 
-  function deleteRecipe() {
-    callAPI({
+  async function deleteRecipe() {
+    const response: APICallResponse = await callAPI({
       path: '/recipe?recipeID=' + recipe.slug,
       apiMethod: APIMethod.DELETE,
       requestBody: {},
       parseResponseJson: false
-    })
+    });
+    if (!response.success) {
+      // TODO: alert the user
+      return;
+    }
     setActiveRecipe(<div></div>);
   }
 

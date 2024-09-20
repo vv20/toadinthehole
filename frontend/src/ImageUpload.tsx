@@ -1,7 +1,7 @@
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import "./ImageUpload.css";
 import { ThemeType } from "./ThemeType";
-import { APIMethod, callAPI } from "./APIService";
+import { APICallResponse, APIMethod, callAPI } from "./APIService";
 import { APINewImageInfo, APIRecipePrevew } from "./APIModel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
@@ -18,11 +18,16 @@ function ImageUpload({
   async function uploadImage(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.files && event.target.files[0]) {
       // get a presigned URL
-      const newImageInfo: APINewImageInfo = await callAPI({
+      const newImageResponse: APICallResponse = await callAPI({
         path: '/image',
         apiMethod: APIMethod.GET,
         parseResponseJson: true,
-      }) as APINewImageInfo;
+      });
+      if (!newImageResponse.success) {
+        // TODO: alert the user
+        return;
+      }
+      const newImageInfo = newImageResponse.payload as APINewImageInfo;
       if (!newImageInfo.presignedUrl || !newImageInfo.imageId) {
         console.log("Missing required information on the API response!")
         return;

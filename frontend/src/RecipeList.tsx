@@ -3,7 +3,7 @@ import { Dispatch, ReactNode, useEffect, useState } from "react";
 import "./RecipeList.css";
 import RecipePreview from "./RecipePreview";
 import { ThemeType } from "./ThemeType";
-import { APIMethod, callAPI } from "./APIService";
+import { APIMethod, callAPI, APICallResponse } from "./APIService";
 import { APIRecipePrevew, DocumentType } from "./APIModel";
 
 function RecipeList({
@@ -24,11 +24,16 @@ function RecipeList({
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const recipeJson: DocumentType = await callAPI({
+        const recipeResponse: APICallResponse = await callAPI({
           'path': '/collection',
           'apiMethod': APIMethod.GET,
           parseResponseJson: true,
-        }) as {[key: string]: DocumentType};
+        });
+        if (!recipeResponse.success) {
+          // TODO: alert the user
+          return;
+        }
+        const recipeJson = recipeResponse.payload as {[key: string]: DocumentType};
         const recipePreviews: APIRecipePrevew[] = recipeJson.recipes as APIRecipePrevew[];
         const recipePreviewNodes: ReactNode[] = [];
 

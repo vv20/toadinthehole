@@ -15,12 +15,17 @@ type APICallArguments = {
     parseResponseJson: boolean;
 }
 
+type APICallResponse = {
+    success: boolean;
+    payload: DocumentType;
+}
+
 async function callAPI({
     path,
     apiMethod,
     requestBody,
     parseResponseJson
-}: APICallArguments): Promise<DocumentType> {
+}: APICallArguments): Promise<APICallResponse> {
     const { idToken } = (await fetchAuthSession()).tokens ?? {};
     const args = {
         apiName: "ToadInTheHoleAPI",
@@ -35,28 +40,54 @@ async function callAPI({
 
     switch (apiMethod) {
         case APIMethod.GET: {
-            const { body } = await get(args).response;
-            if (parseResponseJson) {
-                return body.json();
+            try {
+                const { body, statusCode } = await get(args).response;
+                return {
+                    success: statusCode >= 200 && statusCode <= 400,
+                    payload: parseResponseJson ? await body.json() : await body.text()
+                };
             }
-            else {
-                return body.text();
+            catch (e) {
+                console.log(e);
+                return {
+                    success: false,
+                    payload: ""
+                }
             }
         }
         case APIMethod.POST: {
-            const { body } = await post(args).response;
-            if (parseResponseJson) {
-                return body.json();
+            try {
+                const { body, statusCode } = await post(args).response;
+                return {
+                    success: statusCode >= 200 && statusCode <= 400,
+                    payload: parseResponseJson ? await body.json() : await body.text()
+                };
             }
-            else {
-                return body.text();
+            catch (e) {
+                console.log(e);
+                return {
+                    success: false,
+                    payload: ""
+                }
             }
         }
         case APIMethod.DELETE: {
-            await del(args).response;
-            return "OK";
+            try {
+                const { statusCode } = await del(args).response;
+                return {
+                    success: statusCode >= 200 && statusCode <= 400,
+                    payload: "OK"
+                };
+            }
+            catch (e) {
+                console.log(e);
+                return {
+                    success: false,
+                    payload: ""
+                }
+            }
         }
     }
 }
 
-export { callAPI, APIMethod }
+export { callAPI, APIMethod, type APICallResponse }
