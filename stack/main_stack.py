@@ -92,10 +92,10 @@ class ToadInTheHoleMainStack(Stack):
                     block_public_policy=False,
                     ignore_public_acls=False,
                     restrict_public_buckets=False),
-                cors=s3.CorsRule(
+                cors=[s3.CorsRule(
                     allowed_origins=["*"],
-                    allowed_methods=["PUT"],
-                    allowed_headers=["*"]))
+                    allowed_methods=[s3.HttpMethods.PUT],
+                    allowed_headers=["*"])])
         return frontend_bucket, image_bucket
 
     def create_dynamodb_table(self, environment):

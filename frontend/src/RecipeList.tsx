@@ -32,7 +32,7 @@ function RecipeList({
         const recipePreviews: APIRecipePrevew[] = recipeJson.recipes as APIRecipePrevew[];
         const recipePreviewNodes: ReactNode[] = [];
 
-        if (recipePreviews.length == recipes.length) {
+        if (recipePreviews.length === recipes.length) {
           // recipes already set - avoid infinite loop
           return;
         }
@@ -53,7 +53,7 @@ function RecipeList({
       }
     };
     fetchRecipes();
-  }, [themeType, existingTags, setActiveRecipe, setExistingTags]);
+  }, [themeType, existingTags, recipes.length, setActiveRecipe, setExistingTags]);
 
   return (
     <div className={"RecipeList RecipeList-" + themeType}>
