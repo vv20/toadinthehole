@@ -3,10 +3,10 @@ import os
 
 import aws_cdk as cdk
 
-from stack.cdn_stack import ToadInTheHoleCDNStack
-from stack.frontend_deployment_stack import \
+from stack.main.lib.cdn_stack import ToadInTheHoleCDNStack
+from stack.main.lib.frontend_deployment_stack import \
     ToadInTheHoleFrontendDeploymentStack
-from stack.main_stack import ToadInTheHoleMainStack
+from stack.main.lib.main_stack import ToadInTheHoleMainStack
 
 app = cdk.App()
 

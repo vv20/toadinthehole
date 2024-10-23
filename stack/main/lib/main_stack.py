@@ -12,7 +12,7 @@ from aws_cdk import aws_route53 as route53
 from aws_cdk import aws_route53_targets as route53_targets
 from aws_cdk import aws_s3 as s3
 
-from stack.common import (Component, Domain, LocalBundler,
+from ..common import (Component, Domain, LocalBundler,
                           get_environment_domain)
 
 

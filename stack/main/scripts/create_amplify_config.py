@@ -1,10 +1,9 @@
 import json
-import os
 import sys
 
-from common import Domain
-from get_cognito_user_pool_id import get_cognito_user_pool_id
-from get_cognito_user_pool_web_client_id import \
+from ..common import Domain
+from .get_cognito_user_pool_id import get_cognito_user_pool_id
+from .get_cognito_user_pool_web_client_id import \
     get_cognito_user_pool_web_client_id
 
 

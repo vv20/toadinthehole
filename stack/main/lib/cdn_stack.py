@@ -3,7 +3,7 @@ from aws_cdk import aws_certificatemanager as acm
 from aws_cdk import aws_route53 as route53
 from constructs import Construct
 
-from stack.common import Component, Domain, get_environment_domain
+from ..common import Component, Domain, get_environment_domain
 
 
 class ToadInTheHoleCDNStack(Stack):

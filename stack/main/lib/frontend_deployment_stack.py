@@ -4,7 +4,7 @@ from aws_cdk import Fn, Stack
 from aws_cdk import aws_s3 as s3
 from aws_cdk import aws_s3_deployment as s3_deployment
 
-from stack.common import Component
+from ..common import Component
 
 
 class ToadInTheHoleFrontendDeploymentStack(Stack):

@@ -2,9 +2,7 @@ import sys
 
 import boto3
 
-from common import Component
-
-from get_cognito_user_pool_id import get_cognito_user_pool_id
+from .get_cognito_user_pool_id import get_cognito_user_pool_id
 
 
 def create_user(environment, email, password):

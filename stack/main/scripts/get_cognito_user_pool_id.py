@@ -2,7 +2,7 @@ import sys
 
 import boto3
 
-from common import Component
+from ..common import Component
 
 
 def get_cognito_user_pool_id(environment):
