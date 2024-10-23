@@ -1,5 +1,5 @@
-from common import build_response_body, create_handler
-from model import RecipeCollection
+from .common import build_response_body, create_handler
+from .model import RecipeCollection
 
 
 def get_recipe_collection(event):

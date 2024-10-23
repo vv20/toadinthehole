@@ -1,13 +1,11 @@
 import json
 import os
-
 import pytest
-from image import handler as image_handler
-from recipe import handler as recipe_handler
-from recipe_collection import handler as recipe_collection_handler
-from test_util import InMemoryDatabaseTable
 
-RECIPES_TABLE = InMemoryDatabaseTable()
+from .context import image, recipe_collection, recipe
+from . import test_util
+
+RECIPES_TABLE = test_util.InMemoryDatabaseTable()
 
 
 @pytest.fixture
@@ -16,15 +14,15 @@ def data_setup(mocker):
     os.environ['IMAGE_BUCKET_NAME'] = 'image_bucket_name'
     os.environ['RECIPE_TABLE_NAME'] = 'recipe_table_name'
 
-    mock_dynamodb = mocker.patch('model.dynamodb')
+    mock_dynamodb = mocker.patch('handler.model.dynamodb')
     mock_recipe_table = mock_dynamodb.Table.return_value
     RECIPES_TABLE.bind_to_mock(mock_recipe_table)
-    RECIPES_TABLE.setup('backend/test-assets/setup-data.json')
+    RECIPES_TABLE.setup('backend/tests/assets/setup-data.json')
 
-    mock_s3 = mocker.patch('image.s3')
+    mock_s3 = mocker.patch('handler.image.s3')
     mock_s3.generate_presigned_url.return_value = 'https://presigned.url'
 
-    mock_uuid = mocker.patch('image.uuid')
+    mock_uuid = mocker.patch('handler.image.uuid')
     mock_uuid.uuid4.return_value = '123-456-789'
 
 
@@ -53,22 +51,22 @@ def test_handlers(
         scenario,
         expected_data_after_file_name):
     request = {}
-    with open('backend/test-assets/' + scenario + '-request.json', 'r') as request_file:
+    with open('backend/tests/assets/' + scenario + '-request.json', 'r') as request_file:
         request = json.load(request_file)
 
     expected_response = {}
-    with open('backend/test-assets/' + scenario + '-response.json', 'r') as response_file:
+    with open('backend/tests/assets/' + scenario + '-response.json', 'r') as response_file:
         expected_response = json.load(response_file)
 
     actual_response = {
-            '/collection': recipe_collection_handler,
-            '/image': image_handler,
-            '/recipe': recipe_handler
+            '/collection': recipe_collection.handler,
+            '/image': image.handler,
+            '/recipe': recipe.handler
     }[resource](request, {})
 
     assert actual_response == expected_response
 
     if expected_data_after_file_name is not None:
-        with open('backend/test-assets/' + expected_data_after_file_name, 'r') as expected_data_after_file:
+        with open('backend/tests/assets/' + expected_data_after_file_name, 'r') as expected_data_after_file:
             expected_data_after = json.load(expected_data_after_file)
             assert RECIPES_TABLE.rows == expected_data_after

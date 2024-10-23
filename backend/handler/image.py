@@ -3,7 +3,7 @@ import os
 import uuid
 
 import boto3
-from common import build_response_body, create_handler
+from .common import build_response_body, create_handler
 
 s3 = boto3.client('s3')
 

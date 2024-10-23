@@ -1,7 +1,7 @@
 import json
 
-from common import build_response_body, create_handler
-from model import Recipe
+from .common import build_response_body, create_handler
+from .model import Recipe
 
 
 def get_recipe(event):
