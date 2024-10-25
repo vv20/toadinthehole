@@ -1,9 +1,11 @@
 import { Dispatch, SetStateAction } from "react";
-import { ThemeType } from "./ThemeType";
-import "./ActiveTag.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
-import { APIRecipePrevew } from "./APIModel";
+
+import { APIRecipePrevew } from "../../api/APIModel";
+import { ThemeType } from "../../util/ThemeType";
+
+import "../../styles/editor/ActiveTag.css";
 
 function ActiveTag({
     themeType,
@@ -31,11 +33,11 @@ function ActiveTag({
             });
         };
     }
-
+    
     return (
         <div className={"ActiveTag ActiveTag-" + themeType}>
-            #{tag}
-            <FontAwesomeIcon id={tag} icon={faX} onClick={removeTag(tag)} />
+        #{tag}
+        <FontAwesomeIcon id={tag} icon={faX} onClick={removeTag(tag)} />
         </div>
     );
 }

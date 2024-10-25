@@ -1,5 +1,6 @@
 import { get, post, del } from "aws-amplify/api";
 import { fetchAuthSession } from "aws-amplify/auth";
+
 import { DocumentType } from "./APIModel";
 
 enum APIMethod {
@@ -37,7 +38,7 @@ async function callAPI({
             body: requestBody,
         },
     }
-
+    
     switch (apiMethod) {
         case APIMethod.GET: {
             try {

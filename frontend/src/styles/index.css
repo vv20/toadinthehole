@@ -3,18 +3,18 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
 
 html, body, #root {
-  margin: 0;
-  height: 100%;
-  min-height: 100%;
+    margin: 0;
+    height: 100%;
+    min-height: 100%;
 }
 
 :root {
-  --notebook-font: "Babylonica";
-  --notebook-color: #4a2a0a;
-
-  --pastel-font: "Bona Nova";
-  --pastel-color: #5f86d2;
-  --pastel-highlight-color: #5facd2;
-  --pastel-background-color: #f0ccba;
-  --pastel-opacity: 70%;
+    --notebook-font: "Babylonica";
+    --notebook-color: #4a2a0a;
+    
+    --pastel-font: "Bona Nova";
+    --pastel-color: #5f86d2;
+    --pastel-highlight-color: #5facd2;
+    --pastel-background-color: #f0ccba;
+    --pastel-opacity: 70%;
 }

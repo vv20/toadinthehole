@@ -1,6 +1,8 @@
 import { Dispatch } from "react";
-import { ThemeType } from "./ThemeType";
-import "./ExistingTag.css";
+
+import { ThemeType } from "../../util/ThemeType";
+
+import "../../styles/editor/ExistingTag.css";
 
 function ExistingTag({
     themeType,
@@ -16,9 +18,9 @@ function ExistingTag({
     }
     return (
         <button
-            className={"ExistingTag ExistingTag-" + themeType}
-            onClick={addTagToActive}>
-            {tag}
+        className={"ExistingTag ExistingTag-" + themeType}
+        onClick={addTagToActive}>
+        {tag}
         </button>
     )
 }
