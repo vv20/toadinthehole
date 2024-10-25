@@ -14,15 +14,15 @@ def data_setup(mocker):
     os.environ['IMAGE_BUCKET_NAME'] = 'image_bucket_name'
     os.environ['RECIPE_TABLE_NAME'] = 'recipe_table_name'
 
-    mock_dynamodb = mocker.patch('handler.model.dynamodb')
+    mock_dynamodb = mocker.patch('main.model.dynamodb')
     mock_recipe_table = mock_dynamodb.Table.return_value
     RECIPES_TABLE.bind_to_mock(mock_recipe_table)
     RECIPES_TABLE.setup('backend/tests/assets/setup-data.json')
 
-    mock_s3 = mocker.patch('handler.image.s3')
+    mock_s3 = mocker.patch('main.image.s3')
     mock_s3.generate_presigned_url.return_value = 'https://presigned.url'
 
-    mock_uuid = mocker.patch('handler.image.uuid')
+    mock_uuid = mocker.patch('main.image.uuid')
     mock_uuid.uuid4.return_value = '123-456-789'
 
 
