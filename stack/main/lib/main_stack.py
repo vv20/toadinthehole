@@ -204,7 +204,7 @@ class ToadInTheHoleMainStack(Stack):
             image_bucket):
         lambda_kwargs = {
                 'code'       : lambda_.Code.from_asset(
-                    'backend',
+                    'backend/main',
                     bundling=BundlingOptions(
                         image=lambda_.Runtime.PYTHON_3_9.bundling_image,
                         command=[],
