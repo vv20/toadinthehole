@@ -220,19 +220,19 @@ class ToadInTheHoleMainStack(Stack):
         recipe_handler = lambda_.Function(
                 self,
                 Component.RECIPE_HANDLER.get_component_name(environment),
-                handler='recipe.handler',
+                handler='main.recipe.handler',
                 **lambda_kwargs)
 
         collection_handler = lambda_.Function(
                 self,
                 Component.COLLECTION_HANDLER.get_component_name(environment),
-                handler='recipe_collection.handler',
+                handler='main.recipe_collection.handler',
                 **lambda_kwargs)
 
         image_handler = lambda_.Function(
                 self,
                 Component.IMAGE_HANDLER.get_component_name(environment),
-                handler='image.handler',
+                handler='main.image.handler',
                 **lambda_kwargs)
 
         lambda_invocation_policy = iam.Policy(
