@@ -36,6 +36,7 @@ class Component(Enum):
     FRONTEND_CERTIFICATE           = 'frontend_certificate'
     FRONTEND_DEPLOYMENT            = 'frontend_deployment'
     ENVIRONMENT_CERTIFICATE        = 'environment_certificate'
+    IDENTITY_POOL                  = 'identity_pool'
     IMAGE_BUCKET                   = 'image_bucket'
     IMAGE_BUCKET_READ_ONLY_POLICY  = 'image_bucket_read_only_policy'
     IMAGE_BUCKET_WRITE_ONLY_POLICY = 'image_bucket_write_only_policy'
@@ -50,6 +51,7 @@ class Component(Enum):
     USER_POOL                      = 'user_pool'
     USER_POOL_AUTHORIZER           = 'user_pool_authorizer'
     USER_POOL_CLIENT               = 'user_pool_client'
+    USER_ROLE                      = 'user_role'
 
     def get_component_name(self, environment):
         return COMPONENT_NAME_FORMAT.format(

@@ -1,9 +1,10 @@
+import { uploadData } from 'aws-amplify/storage';
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 
-import { APINewImageInfo, APIRecipePrevew } from "../../api/APIModel";
-import { APICallResponse, APIMethod, callAPI } from "../../api/APIService";
+import { APIRecipePrevew } from "../../api/APIModel";
 import { ThemeType } from "../../util/ThemeType";
 
 import "../../styles/editor/ImageUpload.css";
@@ -18,37 +19,18 @@ function ImageUpload({
     setFormData: Dispatch<SetStateAction<APIRecipePrevew>>,
 }) {
     async function uploadImage(event: ChangeEvent<HTMLInputElement>) {
-        if (event.target.files && event.target.files[0]) {
-            // get a presigned URL
-            const newImageResponse: APICallResponse = await callAPI({
-                path: '/image',
-                apiMethod: APIMethod.GET,
-                parseResponseJson: true,
-            });
-            if (!newImageResponse.success) {
-                // TODO: alert the user
-                return;
+        if (event?.target?.files) {
+            const imageId = uuidv4();
+            try {
+                const result = await uploadData({
+                    key: imageId + '.jpg',
+                    data: event.target.files[0],
+                }).result
+                console.log("Image uploaded: ", result);
             }
-            const newImageInfo = newImageResponse.payload as APINewImageInfo;
-            if (!newImageInfo.presignedUrl || !newImageInfo.imageId) {
-                console.log("Missing required information on the API response!")
-                return;
+            catch (error) {
+                console.log("Error: ", error);
             }
-            
-            // upload the image to the presigned URL
-            const formData = new FormData()
-            formData.append('fileupload', event.target.files[0])
-            fetch(newImageInfo.presignedUrl, {
-                'method': 'PUT',
-                'headers': {
-                    'Content-Type': 'image/jpeg',
-                },
-                'body': event.target.files[0],
-            }).then(() => {
-                // save the image ID to render the uploaded image
-                const imageId: string = newImageInfo.imageId ? newImageInfo.imageId : '';
-                setFormData((prevFormData) => ({ ...prevFormData, 'imageId': imageId }));
-            });
         }
     }
     

@@ -4,6 +4,7 @@ from aws_cdk import aws_certificatemanager as acm
 from aws_cdk import aws_cloudfront as cloudfront
 from aws_cdk import aws_cloudfront_origins as cloudfront_origins
 from aws_cdk import aws_cognito as cognito
+from aws_cdk import aws_cognito_identitypool_alpha as cognito_identitypool
 from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as lambda_
@@ -32,11 +33,11 @@ class ToadInTheHoleMainStack(Stack):
 
         frontend_bucket, image_bucket = self.create_s3_buckets(environment)
         recipe_table = self.create_dynamodb_table(environment)
-        api_role, lambda_role = self.setup_iam(
+        api_role, lambda_role, user_role = self.setup_iam(
                 environment,
                 image_bucket,
                 recipe_table)
-        user_pool = self.setup_cognito(environment)
+        user_pool = self.setup_cognito(environment, user_role)
         recipe_handler, collection_handler, image_handler = self.create_lambda_handlers(
                 environment,
                 api_role,
@@ -122,6 +123,11 @@ class ToadInTheHoleMainStack(Stack):
                 Component.API_ROLE.get_component_name(environment),
                 assumed_by=iam.ServicePrincipal('apigateway.amazonaws.com'))
 
+        user_role = iam.Role(
+                self,
+                Component.USER_ROLE.get_component_name(environment),
+                assumed_by=iam.ServicePrincipal('cognito-identity.amazonaws.com'))
+
         image_bucket_write_only_policy = iam.Policy(
                 self,
                 Component.IMAGE_BUCKET_WRITE_ONLY_POLICY.get_component_name(environment),
@@ -129,12 +135,10 @@ class ToadInTheHoleMainStack(Stack):
                     iam.PolicyStatement(
                         actions=[
                             's3-bucket:PutObject',
-                            's3-bucket:GetObject',
-                            's3-bucket:PutObjectAcl'
                         ],
                         resources=[image_bucket.bucket_arn]
                     )])
-        image_bucket_write_only_policy.attach_to_role(lambda_role)
+        image_bucket_write_only_policy.attach_to_role(user_role)
 
         recipe_table_read_write_policy = iam.Policy(
                 self,
@@ -152,9 +156,9 @@ class ToadInTheHoleMainStack(Stack):
                         resources=[recipe_table.table_arn])])
         recipe_table_read_write_policy.attach_to_role(lambda_role)
 
-        return api_role, lambda_role
+        return api_role, lambda_role, user_role
 
-    def setup_cognito(self, environment):
+    def setup_cognito(self, environment, user_role):
         user_pool = cognito.UserPool(
                 self,
                 Component.USER_POOL.get_component_name(environment),
@@ -192,6 +196,16 @@ class ToadInTheHoleMainStack(Stack):
                 refresh_token_validity=Duration.hours(1),
                 id_token_validity=Duration.minutes(30),
                 access_token_validity=Duration.minutes(30))
+
+        cognito_identitypool.IdentityPool(
+            self,
+            Component.IDENTITY_POOL.get_component_name(environment),
+            identity_pool_name=Component.IDENTITY_POOL.get_component_name(environment),
+            authentication_providers=cognito_identitypool.IdentityPoolAuthenticationProviders(
+                user_pools=[cognito_identitypool.UserPoolAuthenticationProvider(
+                    user_pool=user_pool)]),
+            authenticated_role=user_role
+        )
 
         return user_pool
 

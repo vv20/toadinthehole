@@ -1,23 +1,31 @@
 {
-  "Auth": {
-    "Cognito": {
-      "userPoolClientId": "{user_pool_web_client_id}",
-      "userPoolId": "{user_pool_id}",
-      "passwordFormat": {
-        "minLength": 8,
-        "requireLowercase": true,
-        "requireUppercase": true,
-        "requireNumbers": true,
-        "requireSpecialCharacters": true
-      }
+    "Auth": {
+        "Cognito": {
+            "identityPoolId": "{identity_pool_id}",
+            "userPoolClientId": "{user_pool_web_client_id}",
+            "userPoolId": "{user_pool_id}",
+            "passwordFormat": {
+                "minLength": 8,
+                "requireLowercase": true,
+                "requireUppercase": true,
+                "requireNumbers": true,
+                "requireSpecialCharacters": true
+            }
+        }
+    },
+    "API": {
+        "REST": {
+            "ToadInTheHoleAPI": {
+                "endpoint": "{api_endpoint}",
+                "region": "{region}"
+            }
+        }
+    },
+    "Storage": {
+        "S3": {
+            "bucket": "{image_bucket_name}",
+            "region": "{region}",
+            "identityPoolId": "{identity_pool_id}"
+        }
     }
-  },
-  "API": {
-    "REST": {
-      "ToadInTheHoleAPI": {
-        "endpoint": "{api_endpoint}",
-        "region": "{region}"
-      }
-    }
-  }
 }
