@@ -126,7 +126,7 @@ class ToadInTheHoleMainStack(Stack):
         user_role = iam.Role(
                 self,
                 Component.USER_ROLE.get_component_name(environment),
-                assumed_by=iam.ServicePrincipal('cognito-identity.amazonaws.com'))
+                assumed_by=iam.FederatedPrincipal('cognito-identity.amazonaws.com'))
 
         image_bucket_write_only_policy = iam.Policy(
                 self,
@@ -204,8 +204,7 @@ class ToadInTheHoleMainStack(Stack):
             authentication_providers=cognito_identitypool.IdentityPoolAuthenticationProviders(
                 user_pools=[cognito_identitypool.UserPoolAuthenticationProvider(
                     user_pool=user_pool)]),
-            authenticated_role=user_role
-        )
+            authenticated_role=user_role)
 
         return user_pool
 
