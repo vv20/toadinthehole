@@ -126,7 +126,17 @@ class ToadInTheHoleMainStack(Stack):
         user_role = iam.Role(
                 self,
                 Component.USER_ROLE.get_component_name(environment),
-                assumed_by=iam.FederatedPrincipal('cognito-identity.amazonaws.com'))
+                assumed_by=iam.FederatedPrincipal(
+                    'cognito-identity.amazonaws.com',
+                    assume_role_action='sts:AssumeRoleWithWebIdentity',
+                    conditions={
+                        'StringEquals': {
+                            'cognito-identity.amazonaws.com:aud': 'eu-west-2:86954a34-383d-4969-902f-8cab127d2f6d'
+                        },
+                        'ForAnyValue:StringLike': {
+                            'cognito-identity.amazonaws.com:amr': 'authenticated'
+                        }
+                    }))
 
         image_bucket_write_only_policy = iam.Policy(
                 self,
