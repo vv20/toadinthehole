@@ -184,8 +184,8 @@ class ToadInTheHoleMainStack(Stack):
                     require_digits=True,
                     require_symbols=True),
                 account_recovery=cognito.AccountRecovery.EMAIL_ONLY)
-
-        user_pool.add_client(
+        
+        user_pool_client = user_pool.add_client(
                 Component.USER_POOL_CLIENT.get_component_name(environment),
                 user_pool_client_name=Component.USER_POOL_CLIENT.get_component_name(environment),
                 o_auth=cognito.OAuthSettings(
@@ -203,7 +203,8 @@ class ToadInTheHoleMainStack(Stack):
             identity_pool_name=Component.IDENTITY_POOL.get_component_name(environment),
             authentication_providers=cognito_identitypool.IdentityPoolAuthenticationProviders(
                 user_pools=[cognito_identitypool.UserPoolAuthenticationProvider(
-                    user_pool=user_pool)]),
+                    user_pool=user_pool,
+                    user_pool_client=user_pool_client)]),
             authenticated_role=user_role)
 
         return user_pool
