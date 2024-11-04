@@ -43,7 +43,7 @@ class InMemoryDatabaseTable:
         if item_index == -1:
             return
         for attribute_name in kwargs['ExpressionAttributeValues']:
-            self.rows[i][attribute_name.replace(':', '')] = kwargs['ExpressionAttributeValues'][attribute_name]
+            self.rows[i]['recipe_' + attribute_name.replace(':', '')] = kwargs['ExpressionAttributeValues'][attribute_name]
 
     def delete_items(self, *args, **kwargs):
         self.rows = [row for row in self.rows if not _row_matches_key(row, kwargs['Key'])]

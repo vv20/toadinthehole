@@ -1,49 +1,49 @@
 [
 	{
-		"slug": "recipe1",
-		"name": "Recipe 1",
-		"description": "The first recipe ever",
-		"image_id": "image_id1",
-		"tags": [
+		"recipe_slug": "recipe1",
+		"recipe_name": "Recipe 1",
+		"recipe_description": "The first recipe ever",
+		"recipe_image_id": "image_id1",
+		"recipe_tags": [
 			"tag1",
 			"tag2"
 		]
 	},
 	{
-		"slug": "recipe2",
-		"name": "Recipe 2",
-		"description": "The second recipe ever",
-		"image_id": "image_id2",
-		"tags": [
+		"recipe_slug": "recipe2",
+		"recipe_name": "Recipe 2",
+		"recipe_description": "The second recipe ever",
+		"recipe_image_id": "image_id2",
+		"recipe_tags": [
 			"tag1",
 			"tag3"
 		]
 	},
 	{
-		"slug": "recipe3",
-		"name": "Recipe 3",
-		"description": "The third recipe ever",
-		"image_id": "image_id3",
-		"tags": [
+		"recipe_slug": "recipe3",
+		"recipe_name": "Recipe 3",
+		"recipe_description": "The third recipe ever",
+		"recipe_image_id": "image_id3",
+		"recipe_tags": [
 			"tag2",
 			"tag3"
 		]
 	},
 	{
-		"slug": "recipe4",
-		"name": "Recipe 4",
-		"description": "The forth recipe ever",
-		"image_id": "image_id4",
-		"tags": [
+		"recipe_slug": "recipe4",
+		"recipe_name": "Recipe 4",
+		"recipe_description": "The forth recipe ever",
+		"recipe_image_id": "image_id4",
+		"recipe_tags": [
 			"tag4"
 		]
 	},
 	{
-		"slug": "recipe-5",
-		"name": "Recipe 5",
-		"description": "The fifth recipe ever",
-		"image_id": "image_id5",
-		"tags": [
+		"recipe_slug": "recipe-5",
+		"recipe_name": "Recipe 5",
+		"recipe_description": "The fifth recipe ever",
+		"recipe_image_id": "image_id5",
+		"recipe_tags": [
 			"tag1",
 			"tag2"
 		]

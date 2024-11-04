@@ -19,7 +19,7 @@ class Recipe:
         # try to fetch the recipe from the database
         queryResponse = self.table.get_item(
             Key = {
-                'slug': self.slug
+                'recipe_slug': self.slug
             }
         )
         stored_item = {}
@@ -51,9 +51,9 @@ class Recipe:
         if self.exists:
             self.table.update_item(
                     Key={
-                        'slug': self.slug
+                        'recipe_slug': self.slug
                     },
-                    UpdateExpression='SET name=:name, description=:description, image_id=:image_id, tags=:tags',
+                    UpdateExpression='SET recipe_name=:name, recipe_description=:description, recipe_image_id=:image_id, recipe_tags=:tags',
                     ExpressionAttributeValues={
                         ':name': self.name,
                         ':description': self.description,
@@ -63,11 +63,11 @@ class Recipe:
         else:
             self.table.put_item(
                     Item={
-                        'slug': self.slug,
-                        'name': self.name,
-                        'description': self.description,
-                        'image_id': self.image_id,
-                        'tags': self.tags
+                        'recipe_slug': self.slug,
+                        'recipe_name': self.name,
+                        'recipe_description': self.description,
+                        'recipe_image_id': self.image_id,
+                        'recipe_tags': self.tags
                     })
 
     def delete(self):
@@ -75,7 +75,7 @@ class Recipe:
             return
         self.table.delete_item(
                 Key={
-                    'slug': self.slug
+                    'recipe_slug': self.slug
                 })
         self.exists = False
 
@@ -89,13 +89,13 @@ class RecipeCollection:
             self.tags = tags
             for tag in tags:
                 if condition is None:
-                    condition = Attr('tags').contains(tag)
+                    condition = Attr('recipe_tags').contains(tag)
                 else:
-                    condition = Or(condition, Attr('tags').contains(tag))
+                    condition = Or(condition, Attr('recipe_tags').contains(tag))
             queryResult = self.table.scan(FilterExpression=condition)
         else:
             queryResult = self.table.scan()
-        self.recipes = [Recipe(item['slug'], item) for item in queryResult['Items']]
+        self.recipes = [Recipe(item['recipe_slug'], item) for item in queryResult['Items']]
         # collect the tags from all collected recipes
         self.tags = set()
         for recipe in self.recipes:
@@ -110,8 +110,8 @@ class RecipeCollection:
 
 def get_attribute(stored_item, received_item, attribute_name, default=None):
     result = default
-    if attribute_name in stored_item:
-        result = stored_item[attribute_name]
+    if 'recipe_' + attribute_name in stored_item:
+        result = stored_item['recipe_' + attribute_name]
     if attribute_name in received_item:
         result = received_item[attribute_name]
     return result
