@@ -104,7 +104,7 @@ class ToadInTheHoleMainStack(Stack):
                 self,
                 Component.RECIPE_TABLE.get_component_name(environment),
                 table_name=Component.RECIPE_TABLE.get_component_name(environment),
-                partition_key=dynamodb.Attribute(name='slug', type=dynamodb.AttributeType.STRING),
+                partition_key=dynamodb.Attribute(name='recipe_slug', type=dynamodb.AttributeType.STRING),
                 billing=dynamodb.Billing.on_demand())
         return recipe_table
 
