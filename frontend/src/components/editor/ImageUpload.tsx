@@ -27,6 +27,7 @@ function ImageUpload({
                     data: event.target.files[0],
                 }).result
                 console.log("Image uploaded: ", result);
+                setFormData((prevFormData) => ({ ...prevFormData, image_id: imageId }));
             }
             catch (error) {
                 console.log("Error: ", error);
@@ -46,7 +47,7 @@ function ImageUpload({
     }
     else {
         return (
-            <img src={"images/" + imageId} alt="" />
+            <img src={"https://dev.toadinthehole.com/images/" + imageId} alt="" />
         )
     }
 }

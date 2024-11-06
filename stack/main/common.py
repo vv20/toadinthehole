@@ -4,15 +4,18 @@ from subprocess import CalledProcessError, check_call
 from aws_cdk import ILocalBundling
 from jsii import implements
 
-APPLICATION_NAME = 'ToadInTheHole'
-COMPONENT_DOMAIN_NAME_FORMAT = '{component}.{environment}.{top_level_domain}'
-COMPONENT_NAME_FORMAT = '{application_name}{component_name}{environment}'
-ENVIRONMENT_DOMAIN_NAME_FORMAT = '{environment}.{top_level_domain}'
+APPLICATION_NAME: str = 'ToadInTheHole'
+COMPONENT_DOMAIN_NAME_FORMAT: str = '{component}.{environment}.{top_level_domain}'
+COMPONENT_NAME_FORMAT: str = '{application_name}{component_name}{environment}'
+ENVIRONMENT_DOMAIN_NAME_FORMAT: str = '{environment}.{top_level_domain}'
 
 @implements(ILocalBundling)
 class LocalBundler:
 
-    def try_bundle(self, output_dir, bundling_opts):
+    def try_bundle(
+            self,
+            output_dir: str,
+            bundling_opts: dict[str, str]):
         try:
             check_call('pip install -r backend/requirements.txt -t {}'.format(output_dir), shell=True)
             check_call('cp -a backend/* {}'.format(output_dir), shell=True)
@@ -53,7 +56,7 @@ class Component(Enum):
     USER_POOL_CLIENT               = 'user_pool_client'
     USER_ROLE                      = 'user_role'
 
-    def get_component_name(self, environment):
+    def get_component_name(self, environment: str) -> str:
         return COMPONENT_NAME_FORMAT.format(
                 application_name=APPLICATION_NAME,
                 component_name=self.value.replace('-', '').replace('_', ''),
@@ -63,13 +66,13 @@ class Domain(Enum):
     API      = 'api'
     FRONTEND = 'www'
 
-    def get_domain_name(self, environment, top_level_domain):
+    def get_domain_name(self, environment: str, top_level_domain: str) -> str:
         return COMPONENT_DOMAIN_NAME_FORMAT.format(
                 component=self.value,
                 environment=environment,
                 top_level_domain=top_level_domain)
 
-def get_environment_domain(environment, top_level_domain):
+def get_environment_domain(environment: str, top_level_domain: str) -> str:
     return ENVIRONMENT_DOMAIN_NAME_FORMAT.format(
             environment=environment,
             top_level_domain=top_level_domain)

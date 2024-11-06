@@ -35,6 +35,7 @@ function Header({
     if (isLoggedIn) {
         leftChildren.push(
             <NewRecipeButton
+            key="newRecipeButton"
             themeType={themeType}
             existingTags={existingTags}
             setActiveRecipe={setActiveRecipe}

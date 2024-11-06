@@ -8,41 +8,44 @@ from ..common import Component, Domain, get_environment_domain
 
 class ToadInTheHoleCDNStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(
+            self,
+            scope: Construct,
+            construct_id: str,
+            **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-        domain_name = self.node.try_get_context('domain_name')
-        environment = self.node.try_get_context('environment')
-        host_at_apex = bool(self.node.try_get_context('host_at_apex'))
-        zone = self.lookup_zone(domain_name)
-        frontend_certificate = self.create_certificate(environment, domain_name, zone, host_at_apex)
-        self.frontend_certificate_arn = frontend_certificate.certificate_arn
 
-    def lookup_zone(self, domain_name):
-        return route53.HostedZone.from_lookup(
+        self.domain_name: str = self.node.try_get_context('domain_name')
+        self.stack_environment: str = self.node.try_get_context('environment')
+        self.host_at_apex: bool = bool(self.node.try_get_context('host_at_apex'))
+
+        self.lookup_zone()
+        self.create_certificate()
+        self.create_exports()
+
+    def lookup_zone(self) -> None:
+        self.zone: route53.HostedZone = route53.HostedZone.from_lookup(
                 self,
                 'zone',
-                domain_name=domain_name)
+                domain_name=self.domain_name)
 
-    def create_certificate(
-            self,
-            environment,
-            domain_name,
-            zone,
-            host_at_apex):
-        acm.Certificate(
+    def create_certificate(self) -> None:
+        self.certificate: acm.Certificate = acm.Certificate(
                 self,
-                Component.ENVIRONMENT_CERTIFICATE.get_component_name(environment),
-                domain_name=get_environment_domain(environment, domain_name),
-                validation=acm.CertificateValidation.from_dns(zone))
+                Component.ENVIRONMENT_CERTIFICATE.get_component_name(self.stack_environment),
+                domain_name=get_environment_domain(self.stack_environment, self.domain_name),
+                validation=acm.CertificateValidation.from_dns(self.zone))
 
-        additional_domains = None
-        if host_at_apex:
-            additional_domains = [domain_name]
+        self.additional_domains: list[str] | None = None
+        if self.host_at_apex:
+            self.additional_domains = [self.domain_name]
 
-        frontend_certificate = acm.Certificate(
+        self.frontend_certificate: acm.Certificate = acm.Certificate(
                 self,
-                Component.FRONTEND_CERTIFICATE.get_component_name(environment),
-                domain_name=Domain.FRONTEND.get_domain_name(environment, domain_name),
-                subject_alternative_names=additional_domains,
-                validation=acm.CertificateValidation.from_dns(zone))
-        return frontend_certificate
+                Component.FRONTEND_CERTIFICATE.get_component_name(self.stack_environment),
+                domain_name=Domain.FRONTEND.get_domain_name(self.stack_environment, self.domain_name),
+                subject_alternative_names=self.additional_domains,
+                validation=acm.CertificateValidation.from_dns(self.zone))
+                
+    def create_exports(self) -> None:
+        self.frontend_certificate_arn: str = self.frontend_certificate.certificate_arn
