@@ -1,4 +1,4 @@
-from aws_cdk import BundlingOptions, CfnOutput, Duration, Stack
+from aws_cdk import BundlingOptions, Duration, Stack
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_certificatemanager as acm
 from aws_cdk import aws_cloudfront as cloudfront
@@ -342,12 +342,12 @@ class ToadInTheHoleMainStack(Stack):
                 Component.DISTRIBUTION.get_component_name(self.stack_environment),
                 default_root_object='index.html',
                 default_behavior=cloudfront.BehaviorOptions(
-                    origin=cloudfront_origins.S3Origin(
-                        self.frontend_bucket,
+                    origin=cloudfront_origins.S3BucketOrigin.with_origin_access_identity(
+                        bucket=self.frontend_bucket,
                         origin_access_identity=self.oai)),
                 additional_behaviors={
                     '/image/*': cloudfront.BehaviorOptions(
-                        origin=cloudfront_origins.S3Origin(
+                        origin=cloudfront_origins.S3BucketOrigin.with_origin_access_identity(
                             self.image_bucket,
                             origin_access_identity=self.oai))
                 },
@@ -379,8 +379,4 @@ class ToadInTheHoleMainStack(Stack):
                         route53_targets.Route53RecordTarget(self.frontend_record)))
 
     def create_exports(self) -> None:
-        self.frontend_bucket_export: CfnOutput = CfnOutput(
-                self,
-                Component.FRONTEND_BUCKET_EXPORT.get_component_name(self.stack_environment),
-                export_name=Component.FRONTEND_BUCKET_EXPORT.get_component_name(self.environment),
-                value=self.frontend_bucket.bucket_arn)
+        self.frontend_bucket_arn: str = self.frontend_bucket.bucket_arn

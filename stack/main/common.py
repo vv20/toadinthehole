@@ -35,7 +35,6 @@ class Component(Enum):
     DISTRIBUTION                   = 'distribution'
     FRONTEND_ALIAS_RECORD          = 'frontend_alias_record'
     FRONTEND_BUCKET                = 'frontend_bucket'
-    FRONTEND_BUCKET_EXPORT         = 'frontend_bucket_export'
     FRONTEND_CERTIFICATE           = 'frontend_certificate'
     FRONTEND_DEPLOYMENT            = 'frontend_deployment'
     ENVIRONMENT_CERTIFICATE        = 'environment_certificate'
