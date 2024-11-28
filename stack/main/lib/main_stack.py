@@ -248,7 +248,7 @@ class ToadInTheHoleMainStack(Stack):
                 rest_api_name=Component.API.get_component_name(self.stack_environment),
                 cloud_watch_role=True,
                 domain_name=apigateway.DomainNameOptions(
-                    certificate=self.certificate,
+                    certificate=self.api_certificate,
                     domain_name=Domain.API.get_domain_name(self.stack_environment, self.domain_name)),
                 default_cors_preflight_options=apigateway.CorsOptions(
                     allow_origins=['*'],
