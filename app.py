@@ -27,6 +27,7 @@ ToadInTheHoleFrontendDeploymentStack(
         app,
         'frontend-deployment-' + environment,
         main_stack.frontend_bucket_arn,
+        cross_region_references=True,
         env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')))
 
 
