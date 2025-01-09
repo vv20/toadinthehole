@@ -1,4 +1,4 @@
-from aws_cdk import BundlingOptions, Duration, Stack
+from aws_cdk import BundlingOptions, CfnOutput, Duration, Stack
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_certificatemanager as acm
 from aws_cdk import aws_cloudfront as cloudfront
@@ -379,4 +379,8 @@ class ToadInTheHoleMainStack(Stack):
                         route53_targets.Route53RecordTarget(self.frontend_record)))
 
     def create_exports(self) -> None:
-        self.frontend_bucket_arn: str = self.frontend_bucket.bucket_arn
+        self.frontend_bucket_export: CfnOutput = CfnOutput(
+            self,
+            Component.FRONTEND_BUCKET_EXPORT.get_component_name(self.stack_environment),
+            export_name=Component.FRONTEND_BUCKET_EXPORT.get_component_name(self.stack_environment),
+            value=self.frontend_bucket.bucket_arn)
