@@ -4,7 +4,6 @@ from aws_cdk import aws_certificatemanager as acm
 from aws_cdk import aws_cloudfront as cloudfront
 from aws_cdk import aws_cloudfront_origins as cloudfront_origins
 from aws_cdk import aws_cognito as cognito
-from aws_cdk import aws_cognito_identitypool_alpha as cognito_identitypool
 from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as lambda_
@@ -68,9 +67,9 @@ class ToadInTheHoleMainStack(Stack):
                     ignore_public_acls=False,
                     restrict_public_buckets=False),
                 cors=[s3.CorsRule(
-                    allowed_origins=["*"],
+                    allowed_origins=['*'],
                     allowed_methods=[s3.HttpMethods.PUT],
-                    allowed_headers=["*"])])
+                    allowed_headers=['*'])])
 
     def create_dynamodb_table(self) -> None:
         self.recipe_table: dynamodb.TableV2 = dynamodb.TableV2(
@@ -157,15 +156,41 @@ class ToadInTheHoleMainStack(Stack):
                 id_token_validity=Duration.minutes(30),
                 access_token_validity=Duration.minutes(30))
 
-        self.identity_pool: cognito_identitypool.IdentityPool = cognito_identitypool.IdentityPool(
+        self.identity_pool: cognito.CfnIdentityPool = cognito.CfnIdentityPool(
             self,
             Component.IDENTITY_POOL.get_component_name(self.stack_environment),
             identity_pool_name=Component.IDENTITY_POOL.get_component_name(self.stack_environment),
-            authentication_providers=cognito_identitypool.IdentityPoolAuthenticationProviders(
-                user_pools=[cognito_identitypool.UserPoolAuthenticationProvider(
-                    user_pool=self.user_pool,
-                    user_pool_client=self.user_pool_client)]))
-        self.image_bucket_write_only_policy.attach_to_role(self.identity_pool.authenticated_role)
+            allow_unauthenticated_identities=False,
+            cognito_identity_providers=[
+                cognito.CfnIdentityPool.CognitoIdentityProviderProperty(
+                    client_id=self.user_pool_client.user_pool_client_id,
+                    provider_name=self.user_pool.user_pool_provider_name)])
+
+        self.user_role: iam.Role = iam.Role(
+                self,
+                Component.USER_ROLE.get_component_name(self.stack_environment),
+                assumed_by=iam.FederatedPrincipal(
+                    'cognito-identity.amazonaws.com',
+                    assume_role_action='sts:AssumeRoleWithWebIdentity',
+                    conditions={
+                        'StringEquals': {
+                            'cognito-identity.amazonaws.com:aud': self.identity_pool.ref
+                        },
+                        'ForAnyValue:StringLike': {
+                            'cognito-identity.amazonaws.com:amr': 'authenticated'
+                        }
+                    }))
+        
+        cognito.CfnIdentityPoolRoleAttachment(
+            self,
+            Component.IDENTITY_POOL_ROLE_ATTACHMENT.get_component_name(self.stack_environment),
+            identity_pool_id=self.identity_pool.ref,
+            roles={
+                'authenticated': self.user_role.role_arn,
+            }
+        )
+
+        self.image_bucket_write_only_policy.attach_to_role(self.user_role)
 
     def create_lambda_handlers(self) -> None:
         lambda_kwargs: dict[str, any] = {
