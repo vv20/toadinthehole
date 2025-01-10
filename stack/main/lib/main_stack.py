@@ -96,9 +96,9 @@ class ToadInTheHoleMainStack(Stack):
                 statements=[
                     iam.PolicyStatement(
                         actions=[
-                            's3-bucket:PutObject',
+                            's3:PutObject',
                         ],
-                        resources=[self.image_bucket.bucket_arn]
+                        resources=[self.image_bucket.bucket_arn + '/public/*']
                     )])
 
         self.recipe_table_read_write_policy: iam.Policy = iam.Policy(
