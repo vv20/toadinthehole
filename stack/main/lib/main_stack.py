@@ -91,21 +91,6 @@ class ToadInTheHoleMainStack(Stack):
                 Component.API_ROLE.get_component_name(self.stack_environment),
                 assumed_by=iam.ServicePrincipal('apigateway.amazonaws.com'))
 
-        self.user_role: iam.Role = iam.Role(
-                self,
-                Component.USER_ROLE.get_component_name(self.stack_environment),
-                assumed_by=iam.FederatedPrincipal(
-                    'cognito-identity.amazonaws.com',
-                    assume_role_action='sts:AssumeRoleWithWebIdentity',
-                    conditions={
-                        'StringEquals': {
-                            'cognito-identity.amazonaws.com:aud': 'eu-west-2:86954a34-383d-4969-902f-8cab127d2f6d'
-                        },
-                        'ForAnyValue:StringLike': {
-                            'cognito-identity.amazonaws.com:amr': 'authenticated'
-                        }
-                    }))
-
         self.image_bucket_write_only_policy: iam.Policy = iam.Policy(
                 self,
                 Component.IMAGE_BUCKET_WRITE_ONLY_POLICY.get_component_name(self.stack_environment),
@@ -116,7 +101,6 @@ class ToadInTheHoleMainStack(Stack):
                         ],
                         resources=[self.image_bucket.bucket_arn]
                     )])
-        self.image_bucket_write_only_policy.attach_to_role(self.user_role)
 
         self.recipe_table_read_write_policy: iam.Policy = iam.Policy(
                 self,
@@ -180,8 +164,8 @@ class ToadInTheHoleMainStack(Stack):
             authentication_providers=cognito_identitypool.IdentityPoolAuthenticationProviders(
                 user_pools=[cognito_identitypool.UserPoolAuthenticationProvider(
                     user_pool=self.user_pool,
-                    user_pool_client=self.user_pool_client)]),
-            authenticated_role=self.user_role)
+                    user_pool_client=self.user_pool_client)]))
+        self.image_bucket_write_only_policy.attach_to_role(self.identity_pool.authenticated_role)
 
     def create_lambda_handlers(self) -> None:
         lambda_kwargs: dict[str, any] = {
