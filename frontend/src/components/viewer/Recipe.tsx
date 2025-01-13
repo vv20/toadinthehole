@@ -10,6 +10,7 @@ import "../../styles/container/RecipeFormRow.css";
 import "../../styles/editor/ActiveTag.css";
 import "../../styles/viewer/Recipe.css";
 import "../../styles/viewer/RecipeTitle.css";
+import { getImageUrl } from "../../util/UrlUtil";
 
 function Recipe({ preview }: { preview: APIRecipePreview }) {
     const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
@@ -37,7 +38,10 @@ function Recipe({ preview }: { preview: APIRecipePreview }) {
         <div style={{display: 'flex'}}>
         <div className={"RecipeEditorLeft RecipeEditorLeft-" + themeType}>
         <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
-        <img src={"/public/" + preview.image_id + ".jpg"} alt="no pic :("/>
+        <img
+        src={preview.image_id !== undefined ? getImageUrl({ imageId: preview.image_id }) : ""}
+        alt="no pic :("
+        style={{maxWidth: "100%", height: "auto"}}/>
         </div>
         <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
         <p>{preview.description}</p>

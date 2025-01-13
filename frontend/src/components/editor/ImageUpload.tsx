@@ -9,6 +9,7 @@ import { useAppSelector } from '../../redux/hooks';
 import ThemeType from "../../util/ThemeType";
 
 import "../../styles/editor/ImageUpload.css";
+import { getImageUrl } from '../../util/UrlUtil';
 
 function ImageUpload({
     imageId,
@@ -48,7 +49,7 @@ function ImageUpload({
     }
     else {
         return (
-            <img src={"https://dev.toadinthehole.com/images/" + imageId} alt="" />
+            <img src={getImageUrl({ imageId: imageId })} alt="" style={{maxWidth: "100%", height: "auto"}}/>
         )
     }
 }
