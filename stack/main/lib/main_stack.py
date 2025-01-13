@@ -355,7 +355,7 @@ class ToadInTheHoleMainStack(Stack):
                         bucket=self.frontend_bucket,
                         origin_access_identity=self.oai)),
                 additional_behaviors={
-                    '/image/*': cloudfront.BehaviorOptions(
+                    '/public/*': cloudfront.BehaviorOptions(
                         origin=cloudfront_origins.S3BucketOrigin.with_origin_access_identity(
                             self.image_bucket,
                             origin_access_identity=self.oai))
