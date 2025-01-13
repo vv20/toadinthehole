@@ -2,23 +2,23 @@ import { ChangeEvent, Dispatch, KeyboardEvent, ReactNode, SetStateAction } from 
 
 import ActiveTag from "./ActiveTag";
 import ExistingTag from "./ExistingTag";
-import { APIRecipePrevew } from "../../api/APIModel";
-import { ThemeType } from "../../util/ThemeType";
+import { APIRecipePreview } from "../../api/APIModel";
+import { useAppSelector } from "../../redux/hooks";
+import ThemeType from "../../util/ThemeType";
 
 import "../../styles/editor/NewTag.css";
 import "../../styles/editor/TagEditor.css";
 
 function TagEditor({
-    themeType,
     tags,
-    existingTags,
     setFormData,
 }: {
-    themeType: ThemeType,
     tags?: string[],
-    existingTags: string[],
-    setFormData: Dispatch<SetStateAction<APIRecipePrevew>>,
+    setFormData: Dispatch<SetStateAction<APIRecipePreview>>,
 }) {
+    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+    const existingTags: string[] = useAppSelector((state) => state.existingTags).existingTags;
+
     function createNewTag(tag: string) {
         if (tag === "") {
             return;
@@ -56,7 +56,6 @@ function TagEditor({
         for (var i = 0; i < tags.length; i++) {
             activeTagElements.push(
                 <ActiveTag
-                themeType={themeType}
                 tag={tags[i]}
                 setFormData={setFormData} 
                 />
@@ -67,11 +66,7 @@ function TagEditor({
     const existingTagElements: Array<ReactNode> = [];
     for (i = 0; i < existingTags.length; i++) {
         existingTagElements.push(
-            <ExistingTag
-            themeType={themeType}
-            tag={existingTags[i]}
-            createNewTag={createNewTag}
-            />
+            <ExistingTag tag={existingTags[i]} createNewTag={createNewTag}/>
         );
     }
     

@@ -1,23 +1,18 @@
 import { confirmResetPassword } from "aws-amplify/auth";
-import { ChangeEvent, Dispatch, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 
-import { ThemeType } from "../../util/ThemeType";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { setLogInError, setRequirePasswordChange } from "../../redux/userInfoSlice";
+import ThemeType from "../../util/ThemeType";
 
 import "../../styles/general/Button.css";
 import "../../styles/general/InputField.css";
 import "../../styles/general/InputLabel.css";
 
-function ChangePasswordForm({
-    themeType,
-    username,
-    setLogInError,
-    setRequirePasswordChange,
-}: {
-    themeType: ThemeType;
-    username: string;
-    setLogInError: Dispatch<string>;
-    setRequirePasswordChange: Dispatch<boolean>;
-}) {
+function ChangePasswordForm() {
+    const dispatch = useAppDispatch();
+    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+    const username: string = useAppSelector((state) => state.userInfo).username;
     const [formData, setFormData] = useState({
         password: "",
         code: "",
@@ -38,8 +33,8 @@ function ChangePasswordForm({
             });
         } catch (error) {
             console.log(error);
-            setLogInError("Error while setting a new password");
-            setRequirePasswordChange(false);
+            dispatch(setLogInError({ loginError: "Error while setting a new password" }));
+            dispatch(setRequirePasswordChange({ requirePasswordChange: false }));
         }
     }
     

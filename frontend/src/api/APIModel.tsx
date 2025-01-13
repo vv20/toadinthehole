@@ -2,7 +2,7 @@ type DocumentType = null | boolean | number | string | DocumentType[] | {
     [prop: string]: DocumentType;
 };
 
-type APIRecipePrevew = {
+type APIRecipePreview = {
     slug?: string;
     name?: string;
     image_id?: string;
@@ -15,4 +15,4 @@ type APINewImageInfo = {
     presignedUrl?: string;
 }
 
-export type { APINewImageInfo, APIRecipePrevew, DocumentType };
+export type { APINewImageInfo, APIRecipePreview, DocumentType };

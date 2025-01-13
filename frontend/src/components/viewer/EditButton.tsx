@@ -1,33 +1,19 @@
-import { Dispatch, ReactNode } from "react";
-
-import RecipeEditor from "../editor/RecipeEditor";
-import { APIRecipePrevew } from "../../api/APIModel";
-import { ThemeType } from "../../util/ThemeType";
+import { APIRecipePreview } from "../../api/APIModel";
+import { editRecipe } from "../../redux/activeRecipeSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import ThemeType from "../../util/ThemeType";
 
 import "../../styles/general/Button.css";
 import "../../styles/viewer/EditButton.css";
 
-function EditButton({
-    themeType,
-    preview,
-    existingTags,
-    setActiveRecipe
-}: {
-    themeType: ThemeType;
-    preview: APIRecipePrevew;
-    existingTags: string[];
-    setActiveRecipe: Dispatch<ReactNode>;
-}) {
+function EditButton({ preview }: { preview: APIRecipePreview }) {
+    const dispatch = useAppDispatch();
+    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+
     function editCurrentRecipe() {
-        setActiveRecipe(
-            <RecipeEditor
-            themeType={themeType}
-            recipe={preview}
-            existingTags={existingTags}
-            setActiveRecipe={setActiveRecipe}
-            />
-        );
+        dispatch(editRecipe({ recipeSlug: preview.slug }));
     }
+
     return (
         <button
         className={"Button Button-" + themeType + " EditButton EditButton-" + themeType}

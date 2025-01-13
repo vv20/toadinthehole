@@ -1,45 +1,23 @@
-import { Dispatch, useState } from "react";
-
 import ChangePasswordForm from "./ChangePasswordForm";
 import LoginForm from "./LoginForm";
-import { ThemeType } from "../../util/ThemeType";
+import { useAppSelector } from "../../redux/hooks";
 
-function LoginPage({
-    themeType,
-    setIsLoggedIn,
-}: {
-    themeType: ThemeType;
-    setIsLoggedIn: Dispatch<boolean>;
-}) {
-    const [requirePasswordChange, setRequirePasswordChange] = useState(false);
-    const [logInError, setLogInError] = useState("");
-    const [username, setUsername] = useState("");
+function LoginPage() {
+    const requirePasswordChange: boolean = useAppSelector((state) => state.userInfo).requirePasswordChange;
+    const logInError: string = useAppSelector((state) => state.userInfo).loginError;
     
     if (requirePasswordChange) {
         return (
             <div>
             <b>{logInError}</b>
-            
-            <ChangePasswordForm
-            themeType={themeType}
-            username={username}
-            setLogInError={setLogInError}
-            setRequirePasswordChange={setRequirePasswordChange}
-            />
+            <ChangePasswordForm />
             </div>
         );
     } else {
         return (
             <div>
             <b>{logInError}</b>
-            
-            <LoginForm
-            themeType={themeType}
-            setIsLoggedIn={setIsLoggedIn}
-            setLogInError={setLogInError}
-            setRequirePasswordChange={setRequirePasswordChange}
-            setUsername={setUsername}
-            />
+            <LoginForm />
             </div>
         );
     }

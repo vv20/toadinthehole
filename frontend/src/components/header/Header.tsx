@@ -1,8 +1,10 @@
-import { Dispatch, ReactNode } from "react";
+import { ReactNode } from "react";
 import Select, { GroupBase } from "react-select";
 
 import NewRecipeButton from "./NewRecipeButton";
-import { ThemeType } from "../../util/ThemeType";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { setTheme } from "../../redux/themeSlice";
+import ThemeType from "../../util/ThemeType";
 
 import "../../styles/general/InputLabel.css";
 import "../../styles/header/Header.css";
@@ -10,19 +12,11 @@ import "../../styles/header/ThemeSelector.css";
 import "../../styles/container/HeaderLeft.css";
 import "../../styles/container/HeaderRight.css";
 
-function Header({
-    themeType,
-    isLoggedIn,
-    existingTags,
-    setThemeType,
-    setActiveRecipe,
-}: {
-    themeType: ThemeType;
-    isLoggedIn: boolean;
-    existingTags: string[];
-    setThemeType: Dispatch<ThemeType>;
-    setActiveRecipe: Dispatch<ReactNode>;
-}) {
+function Header() {
+    const dispatch = useAppDispatch();
+    const isLoggedIn: boolean = useAppSelector(state => state.userInfo).isLoggedIn;
+    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+
     const options: GroupBase<string>[] = [];
     Object.values(ThemeType).forEach((tt) => {
         options.push({
@@ -33,14 +27,7 @@ function Header({
     
     const leftChildren: ReactNode[] = [];
     if (isLoggedIn) {
-        leftChildren.push(
-            <NewRecipeButton
-            key="newRecipeButton"
-            themeType={themeType}
-            existingTags={existingTags}
-            setActiveRecipe={setActiveRecipe}
-            />
-        );
+        leftChildren.push(<NewRecipeButton key="newRecipeButton"/>);
     }
     
     return (
@@ -53,7 +40,7 @@ function Header({
         defaultValue="Pastel"
         options={options}
         onChange={(newValue) =>
-            setThemeType(ThemeType[newValue as keyof typeof ThemeType])
+            dispatch(setTheme({ theme: ThemeType[newValue as keyof typeof ThemeType] }))
         }
         />
         </div>

@@ -1,7 +1,9 @@
 import { resetPassword, signIn } from "aws-amplify/auth";
-import { ChangeEvent, Dispatch, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 
-import { ThemeType } from "../../util/ThemeType";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { logIn, setLogInError, setRequirePasswordChange, setUsername } from "../../redux/userInfoSlice";
+import ThemeType from "../../util/ThemeType";
 
 import "../../styles/container/LoginFormRow.css";
 import "../../styles/general/Button.css";
@@ -10,19 +12,9 @@ import "../../styles/general/InputLabel.css";
 import "../../styles/general/PageTitle.css";
 import "../../styles/login/LoginForm.css";
 
-function LoginForm({
-    themeType,
-    setIsLoggedIn,
-    setLogInError,
-    setRequirePasswordChange,
-    setUsername,
-}: {
-    themeType: ThemeType;
-    setIsLoggedIn: Dispatch<boolean>;
-    setLogInError: Dispatch<string>;
-    setRequirePasswordChange: Dispatch<boolean>;
-    setUsername: Dispatch<string>;
-}) {
+function LoginForm() {
+    const dispatch = useAppDispatch();
+    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
     const [formData, setFormData] = useState({ username: "", password: "" });
     
     function handleChange(event: ChangeEvent<HTMLInputElement>) {
@@ -41,22 +33,22 @@ function LoginForm({
             
             switch (nextStep.signInStep) {
                 case "DONE": {
-                    setIsLoggedIn(true);
+                    dispatch(logIn());
                     break;
                 }
                 case "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED": {
-                    setLogInError("Set a new password:");
-                    setRequirePasswordChange(true);
-                    setUsername(formData.username);
+                    dispatch(setLogInError({ loginError: "Set a new password:" }));
+                    dispatch(setRequirePasswordChange({ requirePasswordChange: true }));
+                    dispatch(setUsername({ username: formData.username }));
                     resetPassword({ username: formData.username });
                     break;
                 }
                 default: {
-                    setLogInError("Incorrect username or password");
+                    dispatch(setLogInError({ loginError: "Incorrect username or password" }));
                 }
             }
         } catch (error) {
-            setLogInError("Error while signing in");
+            dispatch(setLogInError({ loginError: "Error while signing in" }));
         }
     }
     

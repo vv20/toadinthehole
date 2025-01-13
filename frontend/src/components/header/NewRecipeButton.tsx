@@ -1,28 +1,15 @@
-import { Dispatch, ReactNode } from "react";
-
-import RecipeEditor from "../editor/RecipeEditor";
-import { ThemeType } from "../../util/ThemeType";
+import { editRecipe } from "../../redux/activeRecipeSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import ThemeType from "../../util/ThemeType";
 
 import "../../styles/header/NewRecipeButton.css";
 
-function NewRecipeButton({
-    themeType,
-    existingTags,
-    setActiveRecipe,
-}: {
-    themeType: ThemeType;
-    existingTags: string[];
-    setActiveRecipe: Dispatch<ReactNode>;
-}) {
+function NewRecipeButton() {
+    const dispatch = useAppDispatch();
+    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+    
     function openNewRecipeEditor() {
-        setActiveRecipe(
-            <RecipeEditor
-            themeType={themeType}
-            recipe={{}}
-            setActiveRecipe={setActiveRecipe}
-            existingTags={existingTags}
-            />
-        );
+        dispatch(editRecipe({recipeSlug: ""}));
     }
     
     return (

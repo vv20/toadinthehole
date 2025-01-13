@@ -4,20 +4,21 @@ import { v4 as uuidv4 } from 'uuid';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 
-import { APIRecipePrevew } from "../../api/APIModel";
-import { ThemeType } from "../../util/ThemeType";
+import { APIRecipePreview } from "../../api/APIModel";
+import { useAppSelector } from '../../redux/hooks';
+import ThemeType from "../../util/ThemeType";
 
 import "../../styles/editor/ImageUpload.css";
 
 function ImageUpload({
-    themeType,
     imageId,
     setFormData,
 }: {
-    themeType: ThemeType,
     imageId?: string,
-    setFormData: Dispatch<SetStateAction<APIRecipePrevew>>,
+    setFormData: Dispatch<SetStateAction<APIRecipePreview>>,
 }) {
+    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+
     async function uploadImage(event: ChangeEvent<HTMLInputElement>) {
         if (event?.target?.files) {
             const imageId = uuidv4();

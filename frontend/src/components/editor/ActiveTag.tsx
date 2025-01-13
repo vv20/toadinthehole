@@ -2,20 +2,21 @@ import { Dispatch, SetStateAction } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 
-import { APIRecipePrevew } from "../../api/APIModel";
-import { ThemeType } from "../../util/ThemeType";
+import { APIRecipePreview } from "../../api/APIModel";
+import { useAppSelector } from "../../redux/hooks";
+import ThemeType from "../../util/ThemeType";
 
 import "../../styles/editor/ActiveTag.css";
 
 function ActiveTag({
-    themeType,
     tag,
     setFormData,
 }: {
-    themeType: ThemeType,
     tag: string,
-    setFormData: Dispatch<SetStateAction<APIRecipePrevew>>,
+    setFormData: Dispatch<SetStateAction<APIRecipePreview>>,
 }) {
+    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+
     function removeTag(tag: string) {
         return () => {
             setFormData((prevFormData) => {

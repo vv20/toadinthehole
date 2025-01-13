@@ -1,11 +1,13 @@
-import { ChangeEvent, Dispatch, ReactNode, useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 import ImageUpload from "./ImageUpload";
 import TagEditor from "./TagEditor";
 import ClearActiveRecipeButton from "../viewer/ClearActiveRecipeButton";
-import { APIRecipePrevew } from "../../api/APIModel";
+import { APIRecipePreview } from "../../api/APIModel";
 import { APICallResponse, APIMethod, callAPI } from "../../api/APIService";
-import { ThemeType } from "../../util/ThemeType";
+import { clearActiveRecipe } from "../../redux/activeRecipeSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import ThemeType from "../../util/ThemeType";
 
 import "../../styles/container/RecipeEditorLeft.css";
 import "../../styles/container/RecipeEditorRight.css";
@@ -15,18 +17,11 @@ import "../../styles/general/InputField.css";
 import "../../styles/viewer/RecipeDescription.css";
 import "../../styles/viewer/RecipeTitle.css";
 
-function RecipeEditor({
-    themeType,
-    recipe,
-    existingTags,
-    setActiveRecipe
-}: {
-    themeType: ThemeType;
-    recipe: APIRecipePrevew;
-    existingTags: string[];
-    setActiveRecipe: Dispatch<ReactNode>;
-}) {
-    const [formData, setFormData] = useState<APIRecipePrevew>(recipe);
+function RecipeEditor({ recipe }: { recipe?: APIRecipePreview }) {
+    const dispatch = useAppDispatch();
+    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+
+    const [formData, setFormData] = useState<APIRecipePreview>(recipe ? recipe : {});
     
     function handleChange(
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -36,8 +31,9 @@ function RecipeEditor({
     }
     
     async function submitRecipe() {
+        const path = recipe ? recipe.slug ? '/recipe?recipeID=' + recipe.slug : '/recipe' : '/recipe';
         const response: APICallResponse = await callAPI({
-            path: '/recipe?recipeID=' + recipe.slug,
+            path: path,
             apiMethod: APIMethod.POST,
             requestBody: formData,
             parseResponseJson: false
@@ -46,12 +42,13 @@ function RecipeEditor({
             // TODO: alert the user
             return;
         }
-        setActiveRecipe(<div></div>);
+        dispatch(clearActiveRecipe());
     }
     
     async function deleteRecipe() {
+        const path = recipe ? recipe.slug ? '/recipe?recipeID=' + recipe.slug : '/recipe' : '/recipe';
         const response: APICallResponse = await callAPI({
-            path: '/recipe?recipeID=' + recipe.slug,
+            path: '/recipe?recipeID=' + path,
             apiMethod: APIMethod.DELETE,
             requestBody: {},
             parseResponseJson: false
@@ -60,7 +57,7 @@ function RecipeEditor({
             // TODO: alert the user
             return;
         }
-        setActiveRecipe(<div></div>);
+        dispatch(clearActiveRecipe());
     }
     
     return (
@@ -78,12 +75,12 @@ function RecipeEditor({
         }
         onChange={handleChange}
         />
-        <ClearActiveRecipeButton themeType={themeType} setActiveRecipe={setActiveRecipe} />
+        <ClearActiveRecipeButton/>
         </div>
         <div style={{display: 'flex'}}>
         <div className={"RecipeEditorLeft RecipeEditorLeft-" + themeType}>
         <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
-        <ImageUpload themeType={themeType} imageId={formData.image_id} setFormData={setFormData}/>
+        <ImageUpload imageId={formData.image_id} setFormData={setFormData}/>
         </div>
         <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
         <textarea
@@ -101,11 +98,7 @@ function RecipeEditor({
         </div>
         <div className={"RecipeEditorRight RecipeEditorRight-" + themeType}>
         <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
-        <TagEditor
-        themeType={themeType}
-        tags={formData.tags}
-        existingTags={existingTags}
-        setFormData={setFormData} />
+        <TagEditor tags={formData.tags} setFormData={setFormData}/>
         </div>
         <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
         <button className={"Button Button-" + themeType} onClick={deleteRecipe}>Delete</button>

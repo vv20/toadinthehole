@@ -1,26 +1,21 @@
-import { Dispatch, ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 
 import RecipePreview from "./RecipePreview";
-import { APIRecipePrevew, DocumentType } from "../../api/APIModel";
+import { APIRecipePreview, DocumentType } from "../../api/APIModel";
 import { APIMethod, callAPI, APICallResponse } from "../../api/APIService";
-import { ThemeType } from "../../util/ThemeType";
+import { setExistingTags } from "../../redux/existingTagsSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { setRecipes } from "../../redux/recipesSlice";
+import ThemeType from "../../util/ThemeType";
 
 import "../../styles/viewer/RecipeList.css";
+import ActiveRecipeContainer from "./ActiveRecipeContainer";
 
-function RecipeList({
-    themeType,
-    activeRecipe,
-    existingTags,
-    setActiveRecipe,
-    setExistingTags,
-}: {
-    themeType: ThemeType;
-    activeRecipe: ReactNode;
-    existingTags: string[];
-    setActiveRecipe: Dispatch<ReactNode>;
-    setExistingTags: Dispatch<string[]>;
-}) {
-    const [recipes, setRecipes] = useState<Array<ReactNode>>([]);
+function RecipeList() {
+    const dispatch = useAppDispatch();
+    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+    const recipes: { [ prop: string ]: APIRecipePreview } = useAppSelector((state) => state.recipes).recipes;
+    const recipesLoaded: boolean = useAppSelector((state) => state.recipes).recipesLoaded;
     
     useEffect(() => {
         const fetchRecipes = async () => {
@@ -35,38 +30,40 @@ function RecipeList({
                     return;
                 }
                 const recipeJson = recipeResponse.payload as {[key: string]: DocumentType};
-                const recipePreviews: APIRecipePrevew[] = recipeJson.recipes as APIRecipePrevew[];
-                const recipePreviewNodes: ReactNode[] = [];
-                
-                if (recipePreviews.length === recipes.length) {
-                    // recipes already set - avoid infinite loop
-                    return;
+                const recipePreviews: APIRecipePreview[] = recipeJson.recipes as APIRecipePreview[];
+
+                const recipePreviewMap: { [ prop: string ]: APIRecipePreview } = {}
+                for (let i = 0; i < recipePreviews.length; i++) {
+                    const recipePreview: APIRecipePreview = recipePreviews[i];
+                    if (recipePreview.slug === undefined) {
+                        // TODO: error
+                        continue;
+                    }
+                    recipePreviewMap[recipePreview.slug] = recipePreview
                 }
                 
-                for (var i = 0; i < recipePreviews.length; i++) {
-                    recipePreviewNodes.push(
-                        <RecipePreview
-                        themeType={themeType}
-                        preview={recipePreviews[i]}
-                        existingTags={existingTags}
-                        setActiveRecipe={setActiveRecipe}/>
-                    );
-                }
-                setRecipes(recipePreviewNodes);
-                setExistingTags(recipeJson.tags as string[]);
+                dispatch(setRecipes({ recipes: recipePreviewMap }));
+                dispatch(setExistingTags({ tags: recipeJson.tags as string[] }));
             } catch (e) {
                 console.log("Error while fetching recipes:", e);
             }
         };
-        fetchRecipes();
-    }, [themeType, existingTags, recipes.length, setActiveRecipe, setExistingTags]);
+        if (!recipesLoaded) {
+            fetchRecipes();
+        }
+    }, [dispatch, recipesLoaded]);
+
+    const recipePreviewNodes: ReactNode[] = [];
+    for (const [, value] of Object.entries(recipes)) {
+        recipePreviewNodes.push(<RecipePreview preview={value} />);
+    }
     
     return (
         <div className={"RecipeList RecipeList-" + themeType}>
         <h1 className={"PageTitle PageTitle-" + themeType}>Recipes:</h1>
-        {activeRecipe}
+        <ActiveRecipeContainer />
         <div style={{display: 'flex', flexWrap: 'wrap'}}>
-        {recipes}
+        {recipePreviewNodes}
         </div>
         </div>
     );

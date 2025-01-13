@@ -3,4 +3,4 @@ enum ThemeType {
     Pastel = "Pastel",
 }
 
-export { ThemeType };
+export default ThemeType;
