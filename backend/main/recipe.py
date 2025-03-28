@@ -20,7 +20,7 @@ def save_recipe(event):
             return build_response_body(400, 'Missing request body', event)
         recipe = Recipe(item=json.loads(event['body']))
     recipe.save()
-    return build_response_body(201, 'OK', event)
+    return build_response_body(201, recipe.toJson(), event)
 
 def delete_recipe(event):
     if not 'queryStringParameters' in event or not 'recipeID' in event['queryStringParameters']:
