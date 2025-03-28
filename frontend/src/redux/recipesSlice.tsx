@@ -19,6 +19,9 @@ export const recipesSlice = createSlice({
         addRecipe: (state, action) => {
             state.recipes[action.payload.recipe.slug] = action.payload.recipe;
         },
+        removeRecipe: (state, action) => {
+            delete state.recipes[action.payload.recipe.slug]
+        },
         setRecipes: (state, action) => {
             state.recipes = action.payload.recipes
             state.recipesLoaded = true
@@ -26,6 +29,6 @@ export const recipesSlice = createSlice({
     }
 })
 
-export const { addRecipe, setRecipes } = recipesSlice.actions
+export const { addRecipe, removeRecipe, setRecipes } = recipesSlice.actions
 
 export default recipesSlice.reducer

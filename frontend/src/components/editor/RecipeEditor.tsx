@@ -7,6 +7,7 @@ import { APIRecipePreview } from "../../api/APIModel";
 import { APICallResponse, APIMethod, callAPI } from "../../api/APIService";
 import { clearActiveRecipe } from "../../redux/activeRecipeSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { addRecipe, removeRecipe } from "../../redux/recipesSlice";
 import ThemeType from "../../util/ThemeType";
 
 import "../../styles/container/RecipeEditorLeft.css";
@@ -43,21 +44,23 @@ function RecipeEditor({ recipe }: { recipe?: APIRecipePreview }) {
             return;
         }
         dispatch(clearActiveRecipe());
+        const responseRecipe: string = (typeof response.payload === "string") ? response.payload : JSON.stringify(response.payload);
+        dispatch(addRecipe({ recipe: JSON.parse(responseRecipe) }))
     }
     
     async function deleteRecipe() {
         const path = recipe ? recipe.slug ? '/recipe?recipeID=' + recipe.slug : '/recipe' : '/recipe';
         const response: APICallResponse = await callAPI({
-            path: '/recipe?recipeID=' + path,
+            path: path,
             apiMethod: APIMethod.DELETE,
             requestBody: {},
             parseResponseJson: false
         });
         if (!response.success) {
             // TODO: alert the user
-            return;
         }
         dispatch(clearActiveRecipe());
+        dispatch(removeRecipe({ recipe: recipe }))
     }
     
     return (
