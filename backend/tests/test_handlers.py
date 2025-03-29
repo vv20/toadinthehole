@@ -20,10 +20,6 @@ def data_setup(mocker):
     RECIPES_TABLE.setup('backend/tests/assets/setup-data.json')
 
     mock_s3 = mocker.patch('main.image.s3')
-    mock_s3.generate_presigned_url.return_value = 'https://presigned.url'
-
-    mock_uuid = mocker.patch('main.image.uuid')
-    mock_uuid.uuid4.return_value = '123-456-789'
 
 
 @pytest.mark.parametrize(
@@ -40,9 +36,7 @@ def data_setup(mocker):
             ('/recipe', 'create-new-recipe', 'data-with-new-recipe.json'),
             ('/recipe', 'create-new-recipe-without-body', 'setup-data.json'),
             ('/recipe', 'delete-recipe', 'data-with-deleted-recipe.json'),
-            ('/recipe', 'delete-non-existent-recipe', 'setup-data.json'),
-            ('/image', 'get-presigned-url', 'setup-data.json')
-
+            ('/recipe', 'delete-non-existent-recipe', 'setup-data.json')
         ]
     )
 def test_handlers(

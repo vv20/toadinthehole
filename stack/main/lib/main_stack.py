@@ -203,8 +203,10 @@ class ToadInTheHoleMainStack(Stack):
                 'role'       : self.lambda_role,
                 'runtime'    : lambda_.Runtime.PYTHON_3_9,
                 'environment': {
-                    'RECIPE_TABLE_NAME': self.recipe_table.table_name,
                     'IMAGE_BUCKET_NAME': self.image_bucket.bucket_name,
+                    'IMAGE_HEIGHT'     : 300,
+                    'IMAGE_WIDTH'      : 300,
+                    'RECIPE_TABLE_NAME': self.recipe_table.table_name,
                 }
         }
 
@@ -303,7 +305,7 @@ class ToadInTheHoleMainStack(Stack):
                     credentials_role=self.api_role))
 
         image_resource.add_method(
-                'GET',
+                'POST',
                 authorizer=self.authorizer,
                 integration=apigateway.LambdaIntegration(
                     self.image_handler,
