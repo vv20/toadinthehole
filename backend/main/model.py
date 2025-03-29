@@ -6,6 +6,7 @@ from boto3.dynamodb.conditions import Attr, Or
 from slugify import slugify
 
 dynamodb = boto3.resource('dynamodb')
+s3 = boto3.client('s3')
 
 class Recipe:
     def __init__(self, slug=None, item=None):
@@ -73,6 +74,9 @@ class Recipe:
     def delete(self):
         if not self.exists:
             return
+        s3.delete_object(
+            Bucket=os.environ['IMAGE_BUCKET_NAME'],
+            Key='/public/' + self.image_id + '.jpg')
         self.table.delete_item(
                 Key={
                     'recipe_slug': self.slug

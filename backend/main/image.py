@@ -23,7 +23,7 @@ def standardise_image(event):
     # retrieve the image from S3
     s3.download_file(
         Bucket=os.environ['IMAGE_BUCKET_NAME'],
-        Key=image_id + '.jpg',
+        Key='/public/' + image_id + '.jpg',
         Filename=input_image_path)
     img: MatLike = cv2.imread(input_image_path, cv2.IMREAD_UNCHANGED)
     
@@ -50,7 +50,7 @@ def standardise_image(event):
     # upload the image back to S3
     s3.upload_file(
         Bucket=os.environ['IMAGE_BUCKET_NAME'],
-        Key=image_id + '.jpg',
+        Key='/public/' + image_id + '.jpg',
         Filename=output_image_path)
 
 handler = create_handler({
