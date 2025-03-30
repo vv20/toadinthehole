@@ -204,8 +204,8 @@ class ToadInTheHoleMainStack(Stack):
                 'runtime'    : lambda_.Runtime.PYTHON_3_9,
                 'environment': {
                     'IMAGE_BUCKET_NAME': self.image_bucket.bucket_name,
-                    'IMAGE_HEIGHT'     : 300,
-                    'IMAGE_WIDTH'      : 300,
+                    'IMAGE_HEIGHT'     : '300',
+                    'IMAGE_WIDTH'      : '300',
                     'RECIPE_TABLE_NAME': self.recipe_table.table_name,
                 }
         }
