@@ -7,5 +7,6 @@
 }
 
 .InputLabel-Pastel {
+	color: var(--pastel-text-color);
 	font-size: 15px;
 }

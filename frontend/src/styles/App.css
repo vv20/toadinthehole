@@ -10,8 +10,8 @@
 }
 
 .App-Pastel {
-	font-family: var(--pastel-font);
-	color: var(--pastel-color);
 	background-color: var(--pastel-background-color);
+	color: var(--pastel-text-color);
+	font-family: var(--pastel-font);
 	opacity: var(--pastel-opacity);
 }

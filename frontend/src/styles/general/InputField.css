@@ -15,11 +15,12 @@
 }
 
 .InputField-Pastel {
-	font-family: var(--pastel-font);
-	font-size: 15px;
+	background: none;
 	border-bottom-color: var(--pastel-color);
-	border-top: none;
+	border-bottom-width: var(--pastel-border-width);
 	border-left: none;
 	border-right: none;
-	background: none;
+	border-top: none;
+	font-family: var(--pastel-font);
+	font-size: 15px;
 }

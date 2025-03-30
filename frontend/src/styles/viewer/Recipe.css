@@ -10,9 +10,12 @@
 }
 
 .Recipe-Pastel {
-	border-style: solid;
-    width: 75%;
-    margin: auto;
-	box-shadow: 0 0px 100px 0 rgba(1,1,1,1), 0 0px 100px 0 rgba(1,1,1,1);
 	background-color: white;
+    border-color: var(--pastel-color);
+    border-radius: var(--pastel-border-radius);
+	border-style: solid;
+    border-width: var(--pastel-border-width);
+	box-shadow: 0 0px 100px 0 rgba(1,1,1,1), 0 0px 100px 0 rgba(1,1,1,1);
+    margin: auto;
+    width: 75%;
 }

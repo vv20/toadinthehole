@@ -12,9 +12,12 @@ html, body, #root {
     --notebook-font: "Babylonica";
     --notebook-color: #4a2a0a;
     
+    --pastel-background-color: white;
+    --pastel-border-radius: 20px;
+    --pastel-border-width: 1px;
+    --pastel-color: #119b41;
     --pastel-font: "Bona Nova";
-    --pastel-color: #5f86d2;
-    --pastel-highlight-color: #5facd2;
-    --pastel-background-color: #f0ccba;
-    --pastel-opacity: 70%;
+    --pastel-highlight-color: #2bdb40;
+    --pastel-opacity: 100%;
+    --pastel-text-color: #09471f;
 }

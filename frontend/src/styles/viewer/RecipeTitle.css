@@ -7,6 +7,7 @@
 }
 
 .RecipeTitle-Pastel {
+	color: var(--pastel-text-color);
 	text-align: center;
 	opacity: var(--pastel-opacity);
 }

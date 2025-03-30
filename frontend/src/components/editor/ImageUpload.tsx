@@ -49,7 +49,7 @@ function ImageUpload({
     }
     else {
         return (
-            <img src={getImageUrl({ imageId: imageId })} alt="" style={{maxWidth: "100%", height: "auto"}}/>
+            <img src={getImageUrl({ imageId: imageId })} alt="" style={{maxWidth: "300px", maxHeight: "300px"}}/>
         )
     }
 }

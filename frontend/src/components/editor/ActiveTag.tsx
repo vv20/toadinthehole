@@ -36,10 +36,11 @@ function ActiveTag({
     }
     
     return (
-        <div className={"ActiveTag ActiveTag-" + themeType}>
+        <button
+        className={"Button Button-" + themeType + " ActiveTag ActiveTag-" + themeType}
+        onClick={removeTag(tag)}>
         #{tag}
-        <FontAwesomeIcon id={tag} icon={faX} onClick={removeTag(tag)} />
-        </div>
+        </button>
     );
 }
 

@@ -41,7 +41,7 @@ function Recipe({ preview }: { preview: APIRecipePreview }) {
         <img
         src={preview.image_id !== undefined ? getImageUrl({ imageId: preview.image_id }) : ""}
         alt="no pic :("
-        style={{maxWidth: "100%", height: "auto"}}/>
+        style={{maxWidth: "300px", maxHeight: "300px"}}/>
         </div>
         <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
         <p>{preview.description}</p>

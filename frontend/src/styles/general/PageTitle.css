@@ -7,4 +7,5 @@
 }
 
 .PageTitle-Pastel {
+	color: var(--pastel-text-color);
 }

@@ -20,9 +20,9 @@ function ExistingTag({
 
     return (
         <button
-        className={"ExistingTag ExistingTag-" + themeType}
+        className={"Button Button-" + themeType + " ExistingTag ExistingTag-" + themeType}
         onClick={addTagToActive}>
-        {tag}
+        #{tag}
         </button>
     )
 }

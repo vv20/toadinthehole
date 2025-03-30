@@ -7,8 +7,10 @@
 
 .Header-Pastel {
 	background-color: white;
-	border-style: solid;
-	border-top-width: 0;
+	border-bottom-width: var(--pastel-border-width);
+	border-color: var(--pastel-color);
 	border-left-width: 0;
 	border-right-width: 0;
+	border-top-width: 0;
+	border-style: solid;
 }

@@ -4,12 +4,13 @@
 }
 
 .Button-Pastel {
-	font-family: var(--pastel-font);
-	border-color: var(--pastel-color);
 	background-color: white;
-	color: var(--pastel-color);
-	padding: 10px;
+	border-color: var(--pastel-color);
+	border-radius: var(--pastel-border-radius);
+    border-width: var(--pastel-border-width);
+	font-family: var(--pastel-font);
 	font-size: 15px;
+	padding: 10px;
 }
 
 .Button-Pastel:hover {

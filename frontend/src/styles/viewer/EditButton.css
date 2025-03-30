@@ -9,4 +9,5 @@
 }
 
 .EditButton-Pastel {
+    border-color: var(--pastel-color);
 }

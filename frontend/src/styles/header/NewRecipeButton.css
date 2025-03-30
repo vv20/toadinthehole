@@ -3,12 +3,14 @@
 
 .NewRecipeButton-Pastel {
 	font-family: var(--pastel-font);
-	color: var(--pastel-color);
+	color: var(--pastel-text-color);
 	background-color: white;
 	border-left: none;
 	border-top: none;
 	border-bottom: none;
-	border-right-width: 1px;
+	border-radius: var(--pastel-border-radius);
+	border-right-width: var(--pastel-border-width);
+	border-right-color: var(--pastel-color);
 	font-size: 15px;
 }
 

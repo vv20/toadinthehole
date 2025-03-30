@@ -7,7 +7,9 @@
 }
 
 .ExistingTag-Pastel {
-    margin: 2px;
-    color: var(--pastel-color);
     background-color: white;
+    border-radius: var(--pastel-border-radius);
+    font-family: inherit;
+    margin: 2px;
+    padding: 8px;
 }

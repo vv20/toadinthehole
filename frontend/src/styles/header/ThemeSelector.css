@@ -13,11 +13,11 @@
 }
 
 .ThemeSelector-Pastel {
-	font-family: var(--pastel-font);
-	font-size: 15px;
-	color: var(--pastel-color);
 	border-left: block;
 	border-left-color: var(--pastel-color);
+	color: var(--pastel-text-color);
+	font-family: var(--pastel-font);
+	font-size: 15px;
 }
 
 .ThemeSelector-Pastel:hover {
