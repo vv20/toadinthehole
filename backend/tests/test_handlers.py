@@ -19,7 +19,8 @@ def data_setup(mocker):
     RECIPES_TABLE.bind_to_mock(mock_recipe_table)
     RECIPES_TABLE.setup('backend/tests/assets/setup-data.json')
 
-    mock_s3 = mocker.patch('main.image.s3')
+    mocker.patch('main.image.s3')
+    mocker.patch('main.model.s3')
 
 
 @pytest.mark.parametrize(
