@@ -38,6 +38,9 @@ jobs:
         uses: Dovyski/setup-opencv-action@v1.1
         with:
           opencv-version: '4.11.0.86'
+          install-deps: false
+          opencv-extra-modules: false
+          BUILD_NEW_PYTHON_SUPPORT: ON
 
       - name: Install Dependencies
         run: |
