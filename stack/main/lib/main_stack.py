@@ -117,7 +117,7 @@ class ToadInTheHoleMainStack(Stack):
                         resources=[self.recipe_table.table_arn])])
         self.recipe_table_read_write_policy.attach_to_role(self.lambda_role)
         self.lambda_role.add_managed_policy(
-            iam.ManagedPolicy.from_aws_managed_policy_name('AWSLambdaBasicExecutionRole'))
+            iam.ManagedPolicy.from_aws_managed_policy_name('service-role/AWSLambdaBasicExecutionRole'))
 
     def setup_cognito(self) -> None:
         self.user_pool: cognito.UserPool = cognito.UserPool(
