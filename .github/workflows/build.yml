@@ -34,14 +34,6 @@ jobs:
         with:
           node-version: 18
 
-      - name: Set up OpenCV
-        uses: Dovyski/setup-opencv-action@v1.1
-        with:
-          opencv-version: '4.x'
-          install-deps: false
-          opencv-extra-modules: false
-          BUILD_NEW_PYTHON_SUPPORT: ON
-
       - name: Install Dependencies
         run: |
           cd $GITHUB_WORKSPACE
@@ -49,7 +41,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-          pip install -r backend/requirements.txt
           # NodeJS
           cd frontend
           npm ci

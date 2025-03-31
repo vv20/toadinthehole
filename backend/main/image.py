@@ -2,8 +2,7 @@ import math
 import os
 
 import boto3
-import cv2
-from cv2.typing import MatLike
+from PIL import Image
 
 from .common import build_response_body, create_handler
 
@@ -25,27 +24,28 @@ def standardise_image(event):
         Bucket=os.environ['IMAGE_BUCKET_NAME'],
         Key='/public/' + image_id + '.jpg',
         Filename=input_image_path)
-    img: MatLike = cv2.imread(input_image_path, cv2.IMREAD_UNCHANGED)
-    
-    # crop to correct aspect ratio
-    img_height: int = img.shape[0]
-    img_width: int = img.shape[1]
-    img_ar: float = img_height / img_width
-    if img_ar > target_ar: # crop height
-        excess_height = img_height - math.floor(img_width * target_ar)
-        height_margin = math.floor(excess_height / 2)
-        img = img[height_margin:img_height - height_margin, :]
-    elif img_ar < target_ar: # crop width
-        excess_width = img_width - math.floor(img_height / target_ar)
-        width_margin = math.floor(excess_width / 2)
-        img = img[:, width_margin:img_width - width_margin]
-    # otherwise the aspect ratio is spot on
+    with Image.open(input_image_path) as img:
+        # crop to correct aspect ratio
+        img_width: int = img.size[0]
+        img_height: int = img.size[1]
+        crop_box: tuple[int, int, int, int] = (0, 0, img_width, img_height)
+        img_ar: float = img_height / img_width
+        if img_ar > target_ar: # crop height
+            excess_height = img_height - math.floor(img_width * target_ar)
+            height_margin = math.floor(excess_height / 2)
+            crop_box = (0, height_margin, img_width, img_height - height_margin)
+        elif img_ar < target_ar: # crop width
+            excess_width = img_width - math.floor(img_height / target_ar)
+            width_margin = math.floor(excess_width / 2)
+            crop_box = (width_margin, 0, img_width - width_margin, img_height)
+        # otherwise the aspect ratio is spot on
+        img = img.crop(crop_box)
 
-    # resize
-    img = cv2.resize(img, (target_width, target_height), interpolation = cv2.INTER_AREA)
+        # resize
+        img = img.resize((target_width, target_height))
 
-    # save
-    cv2.imwrite(output_image_path, img)
+        # save
+        img.save(output_image_path)
 
     # upload the image back to S3
     s3.upload_file(
