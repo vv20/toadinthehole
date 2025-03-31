@@ -34,11 +34,14 @@ jobs:
         with:
           node-version: 18
 
+      - name: Set up OpenCV
+        uses: Dovyski/setup-opencv-action@v1.1
+        with:
+          opencv-version: '4.11.0.86'
+
       - name: Install Dependencies
         run: |
           cd $GITHUB_WORKSPACE
-          # System
-          apt install ninja-build
           # Python
           python -m pip install --upgrade pip
           pip install -r requirements.txt
