@@ -53,6 +53,9 @@ def standardise_image(event):
         Key='/public/' + image_id + '.jpg',
         Filename=output_image_path)
 
+    # return
+    return build_response_body(201, 'OK', event)
+
 handler = create_handler({
         'POST': standardise_image,
 })
