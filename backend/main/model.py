@@ -2,6 +2,7 @@ import json
 import os
 
 import boto3
+from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Attr, Or
 from slugify import slugify
 
@@ -74,9 +75,13 @@ class Recipe:
     def delete(self):
         if not self.exists:
             return
-        s3.delete_object(
-            Bucket=os.environ['IMAGE_BUCKET_NAME'],
-            Key='/public/' + self.image_id + '.jpg')
+        if self.image_id:
+            try:
+                s3.delete_object(
+                    Bucket=os.environ['IMAGE_BUCKET_NAME'],
+                    Key='/public/' + self.image_id + '.jpg')
+            except ClientError:
+                pass
         self.table.delete_item(
                 Key={
                     'recipe_slug': self.slug
