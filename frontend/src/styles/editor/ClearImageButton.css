@@ -1,0 +1,23 @@
+.ClearImageButton {
+}
+
+.ClearImageButton-Notebook {
+}
+
+.ClearImageButton-Pastel {
+    background-color: var(--pastel-background-color);
+	border-color: var(--pastel-color);
+	border-radius: var(--pastel-border-radius);
+	border-style: solid;
+	border-width: var(--pastel-border-width);
+    padding: 4px;
+    padding-right: 5px;
+    position: absolute;
+    right: 5%;
+    top: 5%;
+    z-index: 10;
+}
+
+.ClearImageButton-Pastel:hover {
+    color: var(--pastel-highlight-color);
+}

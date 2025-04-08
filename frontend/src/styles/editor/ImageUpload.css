@@ -13,3 +13,20 @@
     padding-top: 50px;
     padding-bottom: 50px;
 }
+
+.ImageUploadOuter-Pastel {
+	border-color: var(--pastel-color);
+	border-radius: var(--pastel-border-radius);
+	border-style: solid;
+	border-width: var(--pastel-border-width);
+    margin: auto;
+    padding: 10px;
+    position: relative;
+    width: fit-content;
+}
+
+.ImageUploadOuter-Pastel img {
+	border-radius: var(--pastel-border-radius);
+    max-width: 300px;
+    max-height: 300px;
+}

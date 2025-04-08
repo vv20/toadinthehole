@@ -1,5 +1,7 @@
 import { ChangeEvent, useState } from "react";
 
+import { remove, uploadData } from 'aws-amplify/storage';
+
 import ImageUpload from "./ImageUpload";
 import TagEditor from "./TagEditor";
 import ClearActiveRecipeButton from "../viewer/ClearActiveRecipeButton";
@@ -21,6 +23,8 @@ import "../../styles/viewer/RecipeTitle.css";
 function RecipeEditor({ recipe }: { recipe?: APIRecipePreview }) {
     const dispatch = useAppDispatch();
     const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+    const imageFile: File|undefined = useAppSelector((state) => state.image).imageFile;
+    const imageId: string|undefined = useAppSelector((state) => state.image).imageId;
 
     const [formData, setFormData] = useState<APIRecipePreview>(recipe ? recipe : {});
     
@@ -32,6 +36,12 @@ function RecipeEditor({ recipe }: { recipe?: APIRecipePreview }) {
     }
     
     async function submitRecipe() {
+        if (imageId === undefined && formData.image_id !== undefined) {
+            // delete the existing image
+            await remove({ key: formData.image_id + ".jpg" })
+            formData.image_id = undefined
+        }
+
         const path = recipe ? recipe.slug ? '/recipe?recipeID=' + recipe.slug : '/recipe' : '/recipe';
         const response: APICallResponse = await callAPI({
             path: path,
@@ -46,6 +56,30 @@ function RecipeEditor({ recipe }: { recipe?: APIRecipePreview }) {
         dispatch(clearActiveRecipe());
         const responseRecipe: string = (typeof response.payload === "string") ? response.payload : JSON.stringify(response.payload);
         dispatch(addRecipe({ recipe: JSON.parse(responseRecipe) }))
+
+        if (imageFile !== undefined && imageId !== undefined) {
+            try {
+                const result = await uploadData({
+                    key: imageId + ".jpg",
+                    data: imageFile,
+                }).result
+                
+                // trigger the resizing of the image
+                await callAPI({
+                    path: "/image/" + imageId,
+                    apiMethod: APIMethod.POST,
+                    parseResponseJson: false
+                });
+                
+                console.log("Image uploaded: ", result);
+                if (setFormData !== undefined) {
+                    setFormData((prevFormData) => ({ ...prevFormData, image_id: imageId }));
+                }
+            }
+            catch (error) {
+                console.log("Error: ", error);
+            }
+        }
     }
     
     async function deleteRecipe() {
@@ -83,7 +117,7 @@ function RecipeEditor({ recipe }: { recipe?: APIRecipePreview }) {
         <div style={{display: 'flex'}}>
         <div className={"RecipeEditorLeft RecipeEditorLeft-" + themeType}>
         <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
-        <ImageUpload imageId={formData.image_id} setFormData={setFormData}/>
+        <ImageUpload editable={true}/>
         </div>
         <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
         <textarea

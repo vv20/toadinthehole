@@ -1,29 +1,25 @@
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { clearActiveRecipe } from "../../redux/activeRecipeSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { clearImage } from "../../redux/imageSlice";
 import ThemeType from "../../util/ThemeType";
 
-import "../../styles/viewer/ClearActiveRecipeButton.css";
+import "../../styles/editor/ClearImageButton.css";
 
-function ClearActiveRecipeButton() {
+function ClearImageButton() {
     const dispatch = useAppDispatch();
     const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
 
-    function clearRecipe() {
-        dispatch(clearActiveRecipe());
+    function clearImageFile() {
         dispatch(clearImage());
     }
 
     return (
-        <div className={"ClearActiveRecipeButton ClearActiveRecipeButton-" + themeType} onClick={clearRecipe}>
-        <div>
-        <FontAwesomeIcon icon={faX} />
-        </div>
+        <div className={"ClearImageButton ClearImageButton-" + themeType} onClick={clearImageFile}>
+            <FontAwesomeIcon icon={faX} />
         </div>
     )
 }
 
-export default ClearActiveRecipeButton;
+export default ClearImageButton;

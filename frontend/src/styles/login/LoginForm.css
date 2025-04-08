@@ -9,7 +9,10 @@
 }
 
 .LoginForm-Pastel {
-	margin-top: 50px;
-	border-style: solid;
 	background-color: white;
+	border-color: var(--pastel-color);
+	border-radius: var(--pastel-border-radius);
+	border-style: solid;
+	border-width: var(--pastel-border-width);
+	margin-top: 50px;
 }

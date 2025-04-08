@@ -1,57 +1,58 @@
-import { uploadData } from 'aws-amplify/storage';
-import { ChangeEvent, Dispatch, SetStateAction } from "react";
-import { v4 as uuidv4 } from 'uuid';
+import { ReactNode } from "react";
+
+import { ChangeEvent } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 
-import { APIRecipePreview } from "../../api/APIModel";
-import { useAppSelector } from '../../redux/hooks';
+import ClearImageButton from "./ClearImageButton";
+import { uploadImage } from "../../redux/imageSlice";
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import ThemeType from "../../util/ThemeType";
-
-import "../../styles/editor/ImageUpload.css";
 import { getImageUrl } from '../../util/UrlUtil';
 
-function ImageUpload({
-    imageId,
-    setFormData,
-}: {
-    imageId?: string,
-    setFormData: Dispatch<SetStateAction<APIRecipePreview>>,
-}) {
-    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+import "../../styles/editor/ImageUpload.css";
 
-    async function uploadImage(event: ChangeEvent<HTMLInputElement>) {
+function ImageUpload({
+    editable,
+}: {
+    editable: boolean,
+}) {
+    const dispatch = useAppDispatch();
+    const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
+    const imageId: string|undefined = useAppSelector((state) => state.image).imageId;
+    const imageFile: File|undefined = useAppSelector((state) => state.image).imageFile;
+    
+    async function uploadImageFile(event: ChangeEvent<HTMLInputElement>) {
         if (event?.target?.files) {
-            const imageId = uuidv4();
-            try {
-                const result = await uploadData({
-                    key: imageId + '.jpg',
-                    data: event.target.files[0],
-                }).result
-                console.log("Image uploaded: ", result);
-                setFormData((prevFormData) => ({ ...prevFormData, image_id: imageId }));
-            }
-            catch (error) {
-                console.log("Error: ", error);
-            }
+            dispatch(uploadImage({ file: event.target.files[0] }));
         }
     }
     
-    if (imageId == null) {
-        return (
-            <div className={"ImageUpload ImageUpload-" + themeType}>
-            <div>
-            <FontAwesomeIcon icon={faCamera} />
-            </div>
-            <input type="file" onChange={uploadImage} />
-            </div>
-        )
+    var clearImageButton: ReactNode = <div></div>;
+    var innerNode: ReactNode = <div></div>;
+    if (editable && imageId !== undefined) {
+        clearImageButton = <ClearImageButton />;
     }
-    else {
-        return (
-            <img src={getImageUrl({ imageId: imageId })} alt="" style={{maxWidth: "300px", maxHeight: "300px"}}/>
-        )
+    if (editable && imageFile !== undefined) {
+        innerNode = <img src={URL.createObjectURL(imageFile)} alt=""/>;
+    } else if (editable && imageId === undefined) {
+            innerNode = (
+                <div className={"ImageUpload ImageUpload-" + themeType}>
+                    <div>
+                        <FontAwesomeIcon icon={faCamera} />
+                    </div>
+                    <input type="file" onChange={uploadImageFile} />
+                </div>
+            );
+    } else {
+        innerNode = <img src={getImageUrl({ imageId: imageId })} alt=""/>;
     }
+    return (
+        <div className={"ImageUploadOuter ImageUploadOuter-" + themeType}>
+            {clearImageButton}
+            {innerNode}
+        </div>
+    )
 }
 
 export default ImageUpload;

@@ -3,16 +3,22 @@ import { ReactNode } from "react";
 import ClearActiveRecipeButton from "./ClearActiveRecipeButton";
 import EditButton from "./EditButton";
 import { APIRecipePreview } from "../../api/APIModel";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { setImage } from "../../redux/imageSlice";
 import ThemeType from "../../util/ThemeType";
 
 import "../../styles/container/RecipeFormRow.css";
 import "../../styles/editor/ActiveTag.css";
 import "../../styles/viewer/Recipe.css";
 import "../../styles/viewer/RecipeTitle.css";
-import { getImageUrl } from "../../util/UrlUtil";
+import ImageUpload from "../editor/ImageUpload";
 
 function Recipe({ preview }: { preview: APIRecipePreview }) {
+    const dispatch = useAppDispatch();
+    if (preview.image_id) {
+        dispatch(setImage({ imageId: preview.image_id }));
+    }
+
     const themeType: ThemeType = useAppSelector((state) => state.theme).theme;
 
     const tagElements: Array<ReactNode> = [];
@@ -38,10 +44,7 @@ function Recipe({ preview }: { preview: APIRecipePreview }) {
         <div style={{display: 'flex'}}>
         <div className={"RecipeEditorLeft RecipeEditorLeft-" + themeType}>
         <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
-        <img
-        src={preview.image_id !== undefined ? getImageUrl({ imageId: preview.image_id }) : ""}
-        alt="no pic :("
-        style={{maxWidth: "300px", maxHeight: "300px"}}/>
+        <ImageUpload editable={false} />
         </div>
         <div className={"RecipeFormRow RecipeFormRow-" + themeType}>
         <p>{preview.description}</p>
